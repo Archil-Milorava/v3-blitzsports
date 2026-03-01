@@ -13,7 +13,7 @@ const navLinks = [
 ]
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(true)
 
   return (
     <nav className="bg-surface sticky top-0 z-50 flex h-16 w-full items-center justify-between border-b px-6 lg:px-12">
@@ -66,41 +66,39 @@ export default function Navbar() {
 
       {/* MOBILE OVERLAY DRAWER */}
       <div
-        className={`bg-background fixed inset-0 z-50 transform transition-transform duration-500 ease-in-out ${
+        className={`bg-background fixed inset-0 z-50 flex transform flex-col transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } md:hidden`}
       >
-        <div className="flex h-[90%] w-full flex-col gap-4 px-12 py-4">
-          <div className="flex  items-center justify-between">
-            <Link
-              href="/"
-              className="text-accent hover:text-accent-hover cursor-pointer text-2xl font-extrabold"
-            >
-              BLITZ
-            </Link>
-            <X
-              onClick={() => setIsOpen(false)}
-              size={25}
-              className="text-default cursor-pointer transition-all duration-500 hover:opacity-80"
-            />
-          </div>
-          <div className="flex flex-col">
-            {navLinks.map((item) => (
-              <Link
-                className="text-default hover:bg-accent-soft-hover cursor-pointer rounded-md px-2 py-2 transition-all"
-                href={item.href}
-                key={item.name}
-              >
-                {item.name}
-              </Link>
-            ))}
-          </div>
+        {/* top */}
+        <div className="bg-surface flex h-1/12 w-full items-center justify-between border-b px-10">
+          <span className="text-accent bg-accent-second text-2xl font-extrabold tracking-wider transition-all hover:opacity-80">
+            BLITZ
+          </span>
+          <button
+            className="text-foreground cursor-pointer p-2 transition-all hover:opacity-60 md:hidden"
+            onClick={() => setIsOpen(false)}
+          >
+            <X size={28} />
+          </button>
         </div>
-
-        <div className="text-default flex h-[10%] w-full items-center justify-between px-12">
+        {/* MIDDLE */}
+        <ul className="flex flex-1 flex-col items-center gap-4 overflow-x-hidden overflow-y-scroll px-10 py-5">
+          {navLinks.map((item) => (
+            <Link
+              className="hover:text-accent text- font-semibold transition-all"
+              href={item.href}
+              key={item.href}
+            >
+              {item.name}
+            </Link>
+          ))}
+        </ul>
+        {/* bottom */}
+        <div className="bg-surface flex h-1/12 w-full items-center justify-between px-10">
           <Link
             href="/profile"
-            className="hover:text-accent-foreground flex cursor-pointer items-center gap-4"
+            className="flex cursor-pointer items-center gap-2 transition-all hover:opacity-80"
           >
             <Avatar>
               <Avatar.Image
@@ -109,11 +107,11 @@ export default function Navbar() {
               />
               <Avatar.Fallback>JD</Avatar.Fallback>
             </Avatar>
-            <p>profile name</p>
+            <h1>archil milorava</h1>
           </Link>
-          <div>
-            <LogOut size={25} className="hover:text-danger cursor-pointer transition-all" />
-          </div>
+          <button className="text-foreground hover:text-danger cursor-pointer p-2 transition-all md:hidden">
+            <LogOut size={28} />
+          </button>
         </div>
       </div>
     </nav>
