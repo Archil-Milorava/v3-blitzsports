@@ -4,11 +4,12 @@ import { article } from './article-schema'
 
 export const roleEnum = pgEnum('role_enum', ['admin', 'writer', 'user'])
 
-export const user = pgTable('users', {
+export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
   name: text('name').notNull(),
   displayName: text('displayName'),
   email: text('email').notNull().unique(),
+  password: text('password'),
   profileImage: text('profileImage'),
   role: roleEnum('role').default('user').notNull(),
   canEditUser: boolean('canEditUser').default(false).notNull(),
@@ -21,6 +22,6 @@ export const user = pgTable('users', {
     .notNull(),
 })
 
-export const userRelations = relations(user, ({ many }) => ({
+export const userRelations = relations(users, ({ many }) => ({
   articles: many(article),
 }))

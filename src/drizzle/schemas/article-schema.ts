@@ -1,6 +1,6 @@
 import { relations } from 'drizzle-orm'
 import { boolean, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
-import { user } from './user-schema'
+import { users } from './user-schema'
 
 export const badgeEnum = pgEnum('badge_enum', ['news', 'history'])
 
@@ -14,7 +14,7 @@ export const article = pgTable('article', {
   category: text('category'),
   authorId: uuid('authorId')
     .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
+    .references(() => users.id, { onDelete: 'cascade' }),
   softDelete: boolean('softDelete').default(false),
   deletedAt: timestamp('deletedAt'),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
@@ -25,8 +25,8 @@ export const article = pgTable('article', {
 })
 
 export const articleRelations = relations(article, ({ one }) => ({
-  author: one(user, {
+  author: one(users, {
     fields: [article.authorId],
-    references: [user.id],
+    references: [users.id],
   }),
 }))
