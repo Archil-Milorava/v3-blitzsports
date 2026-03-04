@@ -1,4 +1,5 @@
 'use client'
+import { signInAction } from '@/src/server/actions/users/users.actions'
 import { Button, Card, Input, Label, TextField } from '@heroui/react'
 import Link from 'next/link'
 
@@ -9,7 +10,7 @@ const SignInForm = () => {
         <Card.Title>Login</Card.Title>
         <Card.Description>Enter your credentials to access your account</Card.Description>
       </Card.Header>
-      <form>
+      <form action={signInAction}>
         <Card.Content>
           <div className="flex flex-col gap-4">
             <TextField name="email" type="email">

@@ -5,16 +5,17 @@ export const setAuthCookies = async (access: string, refresh: string) => {
 
   cookieStore.set('accessToken', access, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'development' ? false : true,
-    sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'strict',
+    secure: process.env.NODE_ENV === 'production' && true,
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
     path: '/',
-    maxAge: 60 * 60,
+    maxAge: 60,
   })
 
   cookieStore.set('refreshToken', refresh, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'development' ? false : true,
-    sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'strict',
+    secure: process.env.NODE_ENV === 'production' && true,
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    path: '/',
     maxAge: 60 * 60 * 24 * 30,
   })
 }

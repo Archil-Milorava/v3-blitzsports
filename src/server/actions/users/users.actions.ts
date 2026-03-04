@@ -7,6 +7,7 @@ import { createAccessToken, createRefreshToken } from '@/src/lib/auth/authTokens
 import { decodePasswords } from '@/src/lib/auth/decodePasswords'
 import { hashPassword } from '@/src/lib/auth/hashPassword'
 import { eq } from 'drizzle-orm'
+import { cookies } from 'next/headers'
 
 export const signUpAction = async (formData: FormData) => {
   const email = formData.get('email') as string
@@ -54,12 +55,20 @@ export const signInAction = async (formData: FormData) => {
 
   if (!existingUser) throw new Error('შეუძლებელია შესვლა')
 
-  const isPasswordValid = await decodePasswords(password, existingUser.password)
+  const isPasswordValid = await decodePasswords(password, existingUser.password as string)
 
   if (!isPasswordValid) throw new Error('შეუძლებელია შესვლა')
 
   const access = await createAccessToken(existingUser.id)
   const refresh = await createRefreshToken(existingUser.id)
 
-  setAuthCookies(access, refresh)
+  await setAuthCookies(access, refresh)
+}
+
+export const getSession = async () => {
+  const cookieStore = await cookies()
+  const token = cookieStore.get('accessToken')
+
+  if (!token) return null
+  console.log(token)
 }

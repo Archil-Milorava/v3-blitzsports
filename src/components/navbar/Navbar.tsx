@@ -13,7 +13,7 @@ const navLinks = [
 ]
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(true)
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
     <nav className="bg-surface sticky top-0 z-50 flex h-16 w-full items-center justify-between border-b px-6 lg:px-12">
