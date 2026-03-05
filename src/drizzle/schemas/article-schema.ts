@@ -12,7 +12,7 @@ export const article = pgTable('article', {
   coverImage: text('coverImage').notNull(),
   badge: badgeEnum('badge').default('news'),
   category: text('category'),
-  authorId: uuid('authorId')
+  authorId: text('authorId')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   softDelete: boolean('softDelete').default(false),

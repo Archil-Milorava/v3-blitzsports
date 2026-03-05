@@ -1,7 +1,15 @@
+'use client'
+import { authClient } from '@/src/lib/auth-client'
 import { Button, Card, Input, Label, TextField } from '@heroui/react'
 import Link from 'next/link'
 
 const SignInForm = () => {
+  const handleGoogleSignIn = async () => {
+    await authClient.signIn.social({
+      provider: 'google',
+    })
+  }
+
   return (
     <Card className="w-full max-w-md">
       <Card.Header>
@@ -30,6 +38,9 @@ const SignInForm = () => {
           </Link>
         </Card.Footer>
       </form>
+      <Button onClick={handleGoogleSignIn} className="text-xl">
+        google
+      </Button>
     </Card>
   )
 }
