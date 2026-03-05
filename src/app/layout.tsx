@@ -1,9 +1,7 @@
+import { Toast } from '@heroui/react'
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
-import { Toast } from '@heroui/react'
-import { AuthProvider } from '../context/AuthProvider'
-import { getCurrentUser } from '../lib/auth/getCurrentUser'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -25,12 +23,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const user = await getCurrentUser()
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Toast.Provider />
-        <AuthProvider initialUser={user}>{children}</AuthProvider>
+        {children}
       </body>
     </html>
   )
