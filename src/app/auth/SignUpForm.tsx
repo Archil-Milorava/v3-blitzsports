@@ -1,4 +1,3 @@
-'use client'
 import { Button, Card, Input, Label, TextField } from '@heroui/react'
 import Link from 'next/link'
 

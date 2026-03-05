@@ -1,8 +1,9 @@
-import { getCurrentUser } from '@/src/lib/auth/getCurrentUser'
+import React from 'react'
 
-const page = async () => {
-  const user = await getCurrentUser()
-  return <div>hello {user?.displayName}</div>
+const page = () => {
+  return (
+    <div>page</div>
+  )
 }
 
 export default page
