@@ -1,5 +1,4 @@
 'use client'
-import { signUpAction } from '@/src/server/actions/users/users.actions'
 import { Button, Card, Input, Label, TextField } from '@heroui/react'
 import Link from 'next/link'
 
@@ -12,7 +11,7 @@ const SignUpForm = () => {
           შეიყვანეთ თქვენი მონაცემები სარეგისტრაციოდ
         </Card.Description>
       </Card.Header>
-      <form action={signUpAction}>
+      <form>
         <Card.Content>
           <div className="flex flex-col gap-4">
             <TextField name="name" type="text">
