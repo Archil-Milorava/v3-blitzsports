@@ -9,21 +9,33 @@ export async function proxy(request: NextRequest) {
 
   let accessToken = cookies.get('accessToken')?.value
   const refreshToken = cookies.get('refreshToken')?.value
-  const response = NextResponse.next()
+
+  let response = NextResponse.next()
 
   let decodedAccess = accessToken ? await verifyToken(accessToken) : null
 
   if (!decodedAccess && refreshToken) {
     const decodedRefresh = await verifyToken(refreshToken)
+
     if (decodedRefresh && decodedRefresh.userId) {
       accessToken = await createAccessToken(decodedRefresh.userId as string)
       decodedAccess = await verifyToken(accessToken)
+
+      const requestHeaders = new Headers(request.headers)
+      requestHeaders.set('cookie', `accessToken=${accessToken}; refreshToken=${refreshToken}`)
+
+      response = NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      })
+
       response.cookies.set('accessToken', accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
         path: '/',
-        maxAge: 60,
+        maxAge: 60 * 15, 
       })
     }
   }

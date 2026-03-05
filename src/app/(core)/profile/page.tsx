@@ -1,9 +1,8 @@
-import { redirect } from 'next/navigation'
-import React from 'react'
+import { getCurrentUser } from '@/src/lib/auth/getCurrentUser'
 
-const page = () => {
-  
-  return <div>Profile</div>
+const page = async () => {
+  const user = await getCurrentUser()
+  return <div>hello {user?.displayName}</div>
 }
 
 export default page

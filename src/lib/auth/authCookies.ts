@@ -8,7 +8,7 @@ export const setAuthCookies = async (access: string, refresh: string) => {
     secure: process.env.NODE_ENV === 'production' && true,
     sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
     path: '/',
-    maxAge: 60,
+    maxAge: 60 * 15,
   })
 
   cookieStore.set('refreshToken', refresh, {

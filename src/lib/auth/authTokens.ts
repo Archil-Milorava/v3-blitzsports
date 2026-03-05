@@ -5,7 +5,7 @@ const secret = new TextEncoder().encode(process.env.TOKEN_SECRET)
 export const createAccessToken = (userId: string) => {
   return new SignJWT({ userId, type: 'access' })
     .setProtectedHeader({ alg: 'HS256' })
-    .setExpirationTime('60s')
+    .setExpirationTime('15m')
     .setIssuedAt()
     .sign(secret)
 }
