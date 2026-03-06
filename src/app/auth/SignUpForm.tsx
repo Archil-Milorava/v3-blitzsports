@@ -1,7 +1,15 @@
+'use client'
+
+import { authClient } from '@/src/lib/auth-client'
 import { Button, Card, Input, Label, TextField } from '@heroui/react'
-import Link from 'next/link'
+import { GoogleIcon } from './o-auth-icons'
 
 const SignUpForm = () => {
+  const handleGoogleSignIn = async () => {
+    await authClient.signIn.social({
+      provider: 'google',
+    })
+  }
   return (
     <Card className="w-full max-w-md">
       <Card.Header>
@@ -29,13 +37,18 @@ const SignUpForm = () => {
         </Card.Content>
         <Card.Footer className="mt-4 flex flex-col gap-2">
           <Button className="w-full" type="submit">
-            Sign Up
+            რეგისტრაცია
           </Button>
-          <Link className="text-center text-sm" href="#">
-            already have an account?
-          </Link>
         </Card.Footer>
       </form>
+      <div className="bg-muted/10 h-0.5 w-full rounded-2xl"></div>
+      <Card.Description className="text-center">ან გაიარეთ რეგისტრაცია google-ით</Card.Description>
+      <Button
+        onClick={handleGoogleSignIn}
+        className="hover:bg-accent/10 w-full border bg-transparent text-2xl"
+      >
+        <GoogleIcon />
+      </Button>
     </Card>
   )
 }
