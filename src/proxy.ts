@@ -1,5 +1,3 @@
-const protectedPages = ['/profile']
-
 export async function proxy() {}
 
 export const config = {

@@ -1,8 +1,10 @@
 'use client'
 
-import { Avatar } from '@heroui/react'
-import { LogOut, Menu, X } from 'lucide-react'
+import { authClient } from '@/src/lib/auth-client'
+import { Avatar, Chip, toast, Tooltip } from '@heroui/react'
+import { LogIn, LogOutIcon, Menu, X } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 const navLinks = [
@@ -13,7 +15,23 @@ const navLinks = [
 ]
 
 export default function Navbar() {
+  const { data } = authClient.useSession()
+  const user = data?.user
+  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
+  const closeNavbar = () => setIsOpen(false)
+
+  async function handleSignOut() {
+    try {
+      await authClient.signOut()
+      closeNavbar()
+      router.push('/')
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.danger(error.message)
+      }
+    }
+  }
 
   return (
     <nav className="bg-surface sticky top-0 z-50 flex h-16 w-full items-center justify-between border-b px-6 lg:px-12">
@@ -40,19 +58,27 @@ export default function Navbar() {
         ))}
       </div>
 
-      {/* RIGHT: Desktop Avatar */}
+      {/* RIGHT: Desktop Avatar / Auth */}
       <div className="hidden md:block">
         <Link
           href="/profile"
           className="block rounded-full border-2 border-transparent p-1 transition-all hover:border-(--accent)"
         >
-          <Avatar>
-            <Avatar.Image
-              alt="John Doe"
-              src="https://img.heroui.chat/image/avatar?w=400&h=400&u=3"
-            />
-            <Avatar.Fallback>JD</Avatar.Fallback>
-          </Avatar>
+          {user ? (
+            <Avatar>
+              <Avatar.Image
+                alt={user.name ?? 'User'}
+                src={user.image ?? '/avatar.png'}
+                referrerPolicy="no-referrer"
+              />
+              <Avatar.Fallback>{user.name?.charAt(0).toUpperCase() ?? 'U'}</Avatar.Fallback>
+            </Avatar>
+          ) : (
+            <div className="flex items-center gap-1 rounded-2xl px-2 py-1 text-xs tracking-wider">
+              ავტორიზაცია
+              <LogIn size={15} />
+            </div>
+          )}
         </Link>
       </div>
 
@@ -60,6 +86,7 @@ export default function Navbar() {
       <button
         className="text-foreground cursor-pointer p-2 transition-all hover:opacity-60 md:hidden"
         onClick={() => setIsOpen(true)}
+        aria-label="Open menu"
       >
         <Menu size={28} />
       </button>
@@ -70,48 +97,79 @@ export default function Navbar() {
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } md:hidden`}
       >
-        {/* top */}
-        <div className="bg-surface flex h-1/12 w-full items-center justify-between border-b px-10">
-          <span className="text-accent bg-accent-second text-2xl font-extrabold tracking-wider transition-all hover:opacity-80">
+        {/* Top bar */}
+        <div className="bg-surface flex h-16 w-full items-center justify-between border-b px-10">
+          <Link
+            href="/"
+            className="text-accent bg-accent-second text-2xl font-extrabold tracking-wider transition-all hover:opacity-80"
+            onClick={closeNavbar}
+          >
             BLITZ
-          </span>
+          </Link>
           <button
-            className="text-foreground cursor-pointer p-2 transition-all hover:opacity-60 md:hidden"
+            className="text-foreground cursor-pointer p-2 transition-all hover:opacity-60"
             onClick={() => setIsOpen(false)}
+            aria-label="Close menu"
           >
             <X size={28} />
           </button>
         </div>
-        {/* MIDDLE */}
-        <ul className="flex flex-1 flex-col items-center gap-4 overflow-x-hidden overflow-y-scroll px-10 py-5">
+
+        {/* Nav links */}
+        <ul className="items-cente justify- flex flex-1 flex-col gap-6 overflow-y-auto px-10 py-5">
           {navLinks.map((item) => (
-            <Link
-              className="hover:text-accent text- font-semibold transition-all"
-              href={item.href}
-              key={item.href}
-            >
-              {item.name}
-            </Link>
+            <li key={item.href}>
+              <Link
+                className="hover:text-accent text-sm font-semibold transition-all"
+                href={item.href}
+                onClick={closeNavbar}
+              >
+                {item.name}
+              </Link>
+            </li>
           ))}
         </ul>
-        {/* bottom */}
-        <div className="bg-surface flex h-1/12 w-full items-center justify-between px-10">
+
+        {/* Bottom bar */}
+        <div className="bg-surface flex h-16 w-full items-center justify-between border-t px-10">
           <Link
             href="/profile"
             className="flex cursor-pointer items-center gap-2 transition-all hover:opacity-80"
+            onClick={closeNavbar}
           >
-            <Avatar>
-              <Avatar.Image
-                alt="John Doe"
-                src="https://img.heroui.chat/image/avatar?w=400&h=400&u=3"
-              />
-              <Avatar.Fallback>JD</Avatar.Fallback>
-            </Avatar>
-            <h1>archil milorava</h1>
+            {user && (
+              <Avatar>
+                <Avatar.Image
+                  alt={user.name ?? 'User'}
+                  src={user.image ?? '/avatar.png'}
+                  referrerPolicy="no-referrer"
+                />
+                <Avatar.Fallback>{user.name?.charAt(0).toUpperCase() ?? 'U'}</Avatar.Fallback>
+              </Avatar>
+            )}
+            {user?.name && <span className="text-sm font-medium">{user.name}</span>}
           </Link>
-          <button className="text-foreground hover:text-danger cursor-pointer p-2 transition-all md:hidden">
-            <LogOut size={28} />
-          </button>
+
+          {user ? (
+            <Tooltip delay={0}>
+              <Tooltip.Trigger aria-label="Status chip">
+                <Chip color="danger" className="cursor-pointer p-2 hover:opacity-80">
+                  <LogOutIcon onClick={handleSignOut} width={20} />
+                </Chip>
+              </Tooltip.Trigger>
+              <Tooltip.Content className="flex items-center gap-1.5">
+                <p>ანგარიშიდან გამოსვლა</p>
+              </Tooltip.Content>
+            </Tooltip>
+          ) : (
+            <Link
+              href="/auth"
+              className="hover:text-accent flex cursor-pointer items-center gap-1 rounded-2xl px-2 py-1 text-xs tracking-wider transition-all"
+            >
+              ავტორიზაცია
+              <LogIn size={15} />
+            </Link>
+          )}
         </div>
       </div>
     </nav>
