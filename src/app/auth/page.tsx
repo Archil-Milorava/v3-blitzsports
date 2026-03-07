@@ -6,16 +6,18 @@ import SignUpForm from './SignUpForm'
 
 const SignInPage = () => {
   return (
-    <main className="flex h-screen w-full flex-col">
+    <main className="flex min-h-screen w-full flex-col">
       <div>
-        <Surface
-          variant="secondary"
-          className="text-accent hover:text-accent/80 cursor-pointer py-1 pl-6 text-start text-2xl font-extrabold tracking-wider md:text-6xl"
-        >
-          <Link href="/">BLITZ</Link>
+        <Surface variant="secondary" className="flex">
+          <Link
+            className="text-accent hover:text-accent/80 w-full cursor-pointer py-1 pl-6 text-center text-2xl font-extrabold tracking-wider md:text-6xl"
+            href="/"
+          >
+            BLITZ
+          </Link>
         </Surface>
       </div>
-      <div className="flex flex-1 items-start justify-center overflow-scroll pt-2 md:pt-16">
+      <div className="flex flex-1 items-start justify-center overflow-scroll py-4 md:pt-16">
         <Tabs className="w-full max-w-md">
           <Tabs.ListContainer>
             <Tabs.List aria-label="Options">

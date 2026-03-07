@@ -60,11 +60,11 @@ export default function Navbar() {
 
       {/* RIGHT: Desktop Avatar / Auth */}
       <div className="hidden md:block">
-        <Link
-          href="/profile"
-          className="block rounded-full border-2 border-transparent p-1 transition-all hover:border-(--accent)"
-        >
-          {user ? (
+        {user ? (
+          <Link
+            href="/profile"
+            className="hover:border-accent block rounded-full border-2 border-transparent p-1 transition-all"
+          >
             <Avatar>
               <Avatar.Image
                 alt={user.name ?? 'User'}
@@ -73,13 +73,16 @@ export default function Navbar() {
               />
               <Avatar.Fallback>{user.name?.charAt(0).toUpperCase() ?? 'U'}</Avatar.Fallback>
             </Avatar>
-          ) : (
-            <div className="flex items-center gap-1 rounded-2xl px-2 py-1 text-xs tracking-wider">
-              ავტორიზაცია
-              <LogIn size={15} />
-            </div>
-          )}
-        </Link>
+          </Link>
+        ) : (
+          <Link
+            href="/auth"
+            className="flex items-center gap-1 rounded-2xl px-2 py-1 text-xs tracking-wider"
+          >
+            ავტორიზაცია
+            <LogIn size={15} />
+          </Link>
+        )}
       </div>
 
       {/* MOBILE: Hamburger Icon */}
