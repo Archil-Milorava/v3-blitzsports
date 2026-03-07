@@ -2,13 +2,14 @@ import 'dotenv/config'
 import { MongoClient } from 'mongodb'
 import { v4 as uuid } from 'uuid'
 import { db } from '../drizzle'
-import { article, user } from '../drizzle/schema'
+// Fixed: Imported 'users' instead of 'user' to match your schema export
+import { article, users } from '../drizzle/schema'
 
-const mongo = new MongoClient(process.env.MONGO_URL!)
+const mongo = new MongoClient(process.env.MONGO_URI!)
 
 async function migrate() {
   await mongo.connect()
-  const mongoDb = mongo.db('test')
+  const mongoDb = mongo.db('test') // Ensure 'test' is your actual MongoDB database name
 
   const mongoUsers = await mongoDb.collection('users').find().toArray()
   const mongoArticles = await mongoDb.collection('articles').find().toArray()
@@ -28,12 +29,14 @@ async function migrate() {
     const updatedAt = parseDate(u.updatedAt)
 
     try {
-      await db.insert(user).values({
+      // Fixed: Using 'users' instead of 'user'
+      await db.insert(users).values({
         id: newId,
         name: u.fullName,
         displayName: u.nickName ?? null,
         email: u.email,
-        profileImage: u.avatar ?? null,
+        // Fixed: Mapped avatar to 'image' as defined in your Drizzle schema
+        image: u.avatar ?? null,
         role: u.roles?.includes('admin') ? 'admin' : 'user',
         canEditUser: true,
         canMakeArticle: true,
