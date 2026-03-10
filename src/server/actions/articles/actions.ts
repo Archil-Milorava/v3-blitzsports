@@ -3,7 +3,7 @@ import { article } from '@/src/drizzle/schema'
 import { and, desc, eq } from 'drizzle-orm'
 
 export const getLandingNews = async () => {
-  await new Promise((resolve) => setTimeout(resolve, 2000))
+  // await new Promise((resolve) => setTimeout(resolve, 60000))
   const landingNews = await db.query.article.findMany({
     where: and(eq(article.badge, 'news'), eq(article.softDelete, false)),
     orderBy: [desc(article.createdAt)],
