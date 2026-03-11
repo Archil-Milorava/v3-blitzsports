@@ -29,7 +29,7 @@ const LandingNewsPack = async () => {
         {/* dark overlay */}
         <div className="absolute inset-0 bg-black/10" />
 
-        <Chip className="absolute top-4 left-4 z-10">{latestNews.category}</Chip>
+        {/* <Chip className="absolute top-4 left-4 z-10">{latestNews.category}</Chip> */}
 
         <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
           <h2 className="text-xl font-semibold text-white group-hover:underline lg:text-3xl">
@@ -60,11 +60,11 @@ const LandingNewsPack = async () => {
             <div className="relative flex w-4/6 items-center p-3">
               <p className="line-clamp-2 text-lg font-medium group-hover:underline">{news.title}</p>
 
-              <p
+              {/* <p
                 className="text-accent absolute top-2 right-2 z-10 flex items-center text-xs font-semibold"
               >
                 {news.category}
-              </p>
+              </p> */}
             </div>
           </Link>
         ))}
