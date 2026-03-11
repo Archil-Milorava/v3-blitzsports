@@ -1,12 +1,13 @@
 'use client'
 
 import { authClient } from '@/src/lib/auth-client'
-import { Button, Card, FieldError, Input, Label, TextField, toast } from '@heroui/react'
+import { Button, Card, FieldError, Input, Label, Spinner, TextField, toast } from '@heroui/react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { GoogleIcon } from './o-auth-icons'
 import { useRouter } from 'next/navigation'
 import { zodResolver } from '@hookform/resolvers/zod'
 import z from 'zod'
+import { useState } from 'react'
 
 const signUpSchema = z.object({
   name: z.string().min(1, 'სახელი აუცილებელია'),
@@ -17,6 +18,8 @@ const signUpSchema = z.object({
 type Inputs = z.infer<typeof signUpSchema>
 
 const SignUpForm = () => {
+  const [isLoading, setIsLoading] = useState(false)
+
   const router = useRouter()
   const {
     register,
@@ -35,12 +38,14 @@ const SignUpForm = () => {
 
   const handleSignUp: SubmitHandler<Inputs> = async (data) => {
     try {
+      setIsLoading(true)
       const { data: res, error } = await authClient.signUp.email({
         ...data,
         displayName: data.name,
         callbackURL: '/',
       })
 
+      setIsLoading(false)
       if (error) {
         if (error.status === 422 || error.code === 'USER_ALREADY_EXISTS') {
           toast.danger('რეგისტრაცია ვერ მოხერხდა.')
@@ -54,6 +59,7 @@ const SignUpForm = () => {
       router.push('/')
       router.refresh()
     } catch (err) {
+      setIsLoading(false)
       toast.danger('სერვერზე დაფიქსირდა შეცდომა')
     }
   }
@@ -66,7 +72,7 @@ const SignUpForm = () => {
           შეიყვანეთ თქვენი მონაცემები სარეგისტრაციოდ
         </Card.Description>
       </Card.Header>
-      <form onSubmit={handleSubmit(handleSignUp)}>
+      <form onSubmit={handleSubmit(handleSignUp)} method="POST" action="#">
         <Card.Content>
           <div className="flex flex-col gap-4">
             <TextField name="name" type="text" isInvalid={!!errors.name}>
@@ -87,8 +93,10 @@ const SignUpForm = () => {
           </div>
         </Card.Content>
         <Card.Footer className="mt-4 flex flex-col gap-2">
-          <Button className="w-full" type="submit">
-            რეგისტრაცია
+          <Button className="w-full" type="submit" isPending={isLoading}>
+            {({ isPending }) => (
+              <>{isPending ? <Spinner color="current" size="sm" /> : 'რეგისტრაცია'}</>
+            )}
           </Button>
         </Card.Footer>
       </form>

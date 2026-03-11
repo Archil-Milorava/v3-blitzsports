@@ -3,8 +3,16 @@ import { Surface, Tabs } from '@heroui/react'
 import Link from 'next/link'
 import SignInForm from './SignInForm'
 import SignUpForm from './SignUpForm'
+import { headers } from 'next/headers'
+import { auth } from '@/src/lib/auth'
+import { redirect } from 'next/navigation'
 
-const SignInPage = () => {
+const SignInPage = async () => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
+
+  if (session) redirect('/')
   return (
     <main className="flex min-h-screen w-full flex-col">
       <div>

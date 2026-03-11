@@ -16,10 +16,11 @@ export const getLandingNews = async () => {
 }
 
 export const getLandingHistories = async () => {
+  // await new Promise((res) => setTimeout(res, 15000))
   const landingHistories = await db.query.article.findMany({
     where: and(eq(article.badge, 'history'), eq(article.softDelete, false)),
     orderBy: [desc(article.createdAt)],
-    limit: 6,
+    limit: 3,
   })
 
   if (!landingHistories) throw new Error('Histories not found')

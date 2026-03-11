@@ -1,5 +1,4 @@
 import { Facebook } from 'lucide-react'
-import React from 'react'
 
 const Footer = () => {
   return (
@@ -20,7 +19,7 @@ const Footer = () => {
                 target="_blank"
                 className="hover:text-primary text-gray-300 transition-colors"
               >
-                <Facebook />{' '}
+                <Facebook className="text-2xl" />
               </a>
               {/* <a href="#" className="text-gray-300 hover:text-primary transition-colors">
                 <FaInstagram className="text-2xl" />
@@ -79,7 +78,7 @@ const Footer = () => {
 
       {/* Bottom Copyright */}
       <div className="border-t border-gray-800 pt-6 text-center text-gray-400">
-        <p>© 2024-2025 ყველა უფლება დაცულია | BLITZ Sports Media</p>
+        <p>© {new Date().getFullYear()} ყველა უფლება დაცულია | BLITZ Sports Media</p>
         {/* <div className="flex justify-center space-x-4 mt-2 text-sm">
           <a href="#" className="hover:text-primary transition-colors">წესები და პირობები</a>
           <a href="#" className="hover:text-primary transition-colors">კონფიდენციალურობის პოლიტიკა</a>

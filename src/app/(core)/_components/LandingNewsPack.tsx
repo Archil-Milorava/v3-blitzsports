@@ -1,5 +1,4 @@
 import { getLandingNews } from '@/src/server/actions/articles/actions'
-import { Chip } from '@heroui/react'
 import Image from 'next/image'
 import Link from 'next/link'
 

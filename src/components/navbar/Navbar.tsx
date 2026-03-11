@@ -34,7 +34,7 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="bg-surface sticky top-0 z-50 flex h-16 w-full items-center justify-between border-b px-6 lg:px-12">
+    <nav className="bg-default-foreground sticky top-0 z-50 flex h-16 w-full items-center justify-between border-b px-6 shadow-lg lg:px-12">
       {/* LEFT: Logo */}
       <Link
         href="/"
@@ -51,7 +51,7 @@ export default function Navbar() {
           <Link
             key={link.name}
             href={link.href}
-            className="text-foreground hover:text-accent text-sm font-semibold transition-colors"
+            className="text-accent-foreground hover:text-accent text-sm font-semibold transition-colors"
           >
             {link.name}
           </Link>
@@ -68,16 +68,16 @@ export default function Navbar() {
             <Avatar>
               <Avatar.Image
                 alt={user.name ?? 'User'}
-                src={user.image ?? '/avatar.png'}
+                src={user.image ?? ''}
                 referrerPolicy="no-referrer"
               />
-              <Avatar.Fallback>{user.name?.charAt(0).toUpperCase() ?? 'U'}</Avatar.Fallback>
+              <Avatar.Fallback>{user.name?.charAt(0).toUpperCase() ?? 'B'}</Avatar.Fallback>
             </Avatar>
           </Link>
         ) : (
           <Link
             href="/auth"
-            className="flex items-center gap-1 rounded-2xl px-2 py-1 text-xs tracking-wider"
+            className="text-accent-foreground hover:text-accent flex items-center gap-1 rounded-2xl px-2 py-1 text-xs tracking-wider"
           >
             ავტორიზაცია
             <LogIn size={15} />
@@ -87,7 +87,7 @@ export default function Navbar() {
 
       {/* MOBILE: Hamburger Icon */}
       <button
-        className="text-foreground cursor-pointer p-2 transition-all hover:opacity-60 md:hidden"
+        className="text-accent-foreground cursor-pointer p-2 transition-all hover:opacity-60 md:hidden"
         onClick={() => setIsOpen(true)}
         aria-label="Open menu"
       >
@@ -101,7 +101,7 @@ export default function Navbar() {
         } md:hidden`}
       >
         {/* Top bar */}
-        <div className="bg-surface flex h-16 w-full items-center justify-between border-b px-10">
+        <div className="bg-default-foreground flex h-16 w-full items-center justify-between border-b px-10">
           <Link
             href="/"
             className="text-accent bg-accent-second text-2xl font-extrabold tracking-wider transition-all hover:opacity-80"
@@ -110,7 +110,7 @@ export default function Navbar() {
             BLITZ
           </Link>
           <button
-            className="text-foreground cursor-pointer p-2 transition-all hover:opacity-60"
+            className="text-accent-foreground cursor-pointer p-2 transition-all hover:opacity-60"
             onClick={() => setIsOpen(false)}
             aria-label="Close menu"
           >
@@ -144,10 +144,10 @@ export default function Navbar() {
               <Avatar>
                 <Avatar.Image
                   alt={user.name ?? 'User'}
-                  src={user.image ?? '/avatar.png'}
+                  src={user.image ?? ''}
                   referrerPolicy="no-referrer"
                 />
-                <Avatar.Fallback>{user.name?.charAt(0).toUpperCase() ?? 'U'}</Avatar.Fallback>
+                <Avatar.Fallback>{user.name?.charAt(0).toUpperCase() ?? 'B'}</Avatar.Fallback>
               </Avatar>
             )}
             {user?.name && <span className="text-sm font-medium">{user.name}</span>}

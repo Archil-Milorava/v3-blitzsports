@@ -1,7 +1,7 @@
-import { Separator } from '@heroui/react';
-import { ChevronRight } from 'lucide-react';
+import { Separator } from '@heroui/react'
+import { ChevronRight } from 'lucide-react'
 
-import Link from 'next/link';
+import Link from 'next/link'
 
 const CategorySeparator = ({ title, url }: { title: string; url: string }) => {
   return (
@@ -18,7 +18,7 @@ const CategorySeparator = ({ title, url }: { title: string; url: string }) => {
       </div>
       <Separator className="bg-accent" />
     </Link>
-  );
-};
+  )
+}
 
-export default CategorySeparator;
+export default CategorySeparator
