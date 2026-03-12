@@ -1,6 +1,6 @@
 import { db } from '@/src/drizzle'
 import { article } from '@/src/drizzle/schema'
-import { and, desc, eq } from 'drizzle-orm'
+import { and, count, desc, eq } from 'drizzle-orm'
 
 export const getLandingNews = async () => {
   // await new Promise((resolve) => setTimeout(resolve, 60000))
@@ -29,10 +29,10 @@ export const getLandingHistories = async () => {
 }
 
 export const getNewsByCategory = async (category: string, page: number = 1) => {
-  const limit = 10
+  const limit = 6
   const offset = (page - 1) * limit
 
-  const articlesByCatogories = await db.query.article.findMany({
+  const articles = await db.query.article.findMany({
     where: (article, { eq, and }) =>
       and(eq(article.category, category), eq(article.softDelete, false)),
     orderBy: (article, { desc }) => [desc(article.createdAt)],
@@ -40,9 +40,15 @@ export const getNewsByCategory = async (category: string, page: number = 1) => {
     offset: offset,
   })
 
-  if (!articlesByCatogories) throw new Error('News not found')
+  const totalArticles = await db
+    .select({ count: count() })
+    .from(article)
+    .where(and(eq(article.category, category), eq(article.softDelete, false)))
 
-  return articlesByCatogories
+  return {
+    articles,
+    totalPages: Math.ceil(totalArticles[0].count / limit),
+  }
 }
 
 export const getArticleByUserId = async (userId: string, page: number = 1) => {

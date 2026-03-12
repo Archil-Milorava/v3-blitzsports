@@ -10,7 +10,7 @@ import { useState } from 'react'
 const navLinks = [
   { name: 'ფეხბურთი', href: '/football' },
   { name: 'MMA', href: '/mma' },
-  { name: 'ფორმულა 1', href: '/formula-1' },
+  { name: 'ფორმულა 1', href: '/f1' },
   { name: 'სხვა', href: '/other' },
 ]
 
