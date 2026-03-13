@@ -1,4 +1,5 @@
 import { InferSelectModel } from 'drizzle-orm'
-import { article } from '../drizzle/schema'
+import { article, users } from '../drizzle/schema'
 
 export type Article = InferSelectModel<typeof article>
+export type Author = InferSelectModel<typeof users>

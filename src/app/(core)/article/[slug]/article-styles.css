@@ -1,0 +1,52 @@
+/* article-styles.css */
+.article-content {
+  --paragraph-spacing: 1.5rem;
+  --text-color: #2c3441; /* gray-700 */
+  --line-height: 1.7;
+  --link-color: #7c3aed; /* violet-600 */
+  --link-hover: #5b21b6; /* violet-800 */
+  --quote-border: #6b7280; /* gray-500 */
+  --strikethrough: #6b7280; /* gray-500 */
+}
+
+.article-content p {
+  margin-bottom: var(--paragraph-spacing);
+  color: var(--text-color);
+  line-height: var(--line-height);
+  font-size: 1.1em;
+}
+
+.article-content blockquote {
+  border-left: 4px solid var(--quote-border);
+  padding-left: 1rem;
+  font-style: italic;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  margin: 1.5rem 0;
+}
+
+.article-content h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 1.5rem 0;
+}
+
+.article-content h3 {
+  font-size: 1.125rem;
+  font-weight: bold;
+  margin: 1rem 0;
+}
+
+.article-content a {
+  color: var(--link-color);
+  text-decoration: underline;
+}
+
+.article-content a:hover {
+  color: var(--link-hover);
+}
+
+.article-content s {
+  text-decoration: line-through;
+  color: var(--strikethrough);
+}

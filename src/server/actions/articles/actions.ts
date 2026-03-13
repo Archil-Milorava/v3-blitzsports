@@ -1,5 +1,6 @@
 import { db } from '@/src/drizzle'
 import { article } from '@/src/drizzle/schema'
+import { publicUserSelect } from '@/src/drizzle/selects'
 import { and, count, desc, eq } from 'drizzle-orm'
 
 export const getLandingNews = async () => {
@@ -49,6 +50,21 @@ export const getNewsByCategory = async (category: string, page: number = 1) => {
     articles,
     totalPages: Math.ceil(totalArticles[0].count / limit),
   }
+}
+
+export const getArticle = async (articleSlug: string) => {
+  const articleBySlug = await db.query.article.findFirst({
+    where: eq(article.slug, articleSlug),
+    with: {
+      author: {
+        columns: publicUserSelect,
+      },
+    },
+  })
+
+  if (!articleBySlug) throw new Error('Article not found')
+
+  return articleBySlug
 }
 
 export const getArticleByUserId = async (userId: string, page: number = 1) => {
