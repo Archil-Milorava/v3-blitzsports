@@ -3,6 +3,8 @@ import Image from 'next/image'
 import './article-styles.css'
 import SocMediaShare from '@/src/components/SocMediaShare'
 import MmaBanner from '../../_components/MmaBanner'
+import { publishDate } from '@/src/utils/utils'
+
 
 interface pageProps {
   params: Promise<{ slug: string }>
@@ -14,13 +16,7 @@ const page = async ({ params }: pageProps) => {
   const article = await getArticle(decodedSlug)
   const shareUrl = `https://www.blitzsports.live/article/${decodedSlug}`
   const shareText = encodeURIComponent(article.title)
-  const publishDate = new Date(article.createdAt).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
 
-  console.log(article)
 
   return (
     <main className="flex min-h-screen w-full flex-col px-8 py-10 sm:px-12 md:px-20 lg:px-32 xl:px-72">
@@ -46,7 +42,7 @@ const page = async ({ params }: pageProps) => {
           </div>
           <div>
             <p className="text-sm font-medium text-gray-900">{article.author?.displayName || ''}</p>
-            <p className="text-xs text-gray-500">{publishDate}</p>
+            <p className="text-xs text-gray-500">{publishDate(article.createdAt)}</p>
           </div>
         </div>
       </div>

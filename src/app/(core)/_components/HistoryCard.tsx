@@ -1,5 +1,5 @@
 import { Article } from '@/src/types/types'
-import getPlainTextExcerpt from '@/src/utils/utils'
+import { getPlainTextExcerpt } from '@/src/utils/utils'
 import Image from 'next/image'
 import Link from 'next/link'
 
