@@ -3,8 +3,8 @@ import { Tabs } from '@heroui/react'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import Profile from './Profile'
-import MyArticles from './MyArticles'
 import ManageUsers from './ManageUsers'
+import { MyArticles } from './MyArticles'
 
 const page = async () => {
   const session = await auth.api.getSession({
@@ -14,9 +14,7 @@ const page = async () => {
 
   const currentUser = session.user
   const isAdmin = currentUser.role === 'admin'
-  const isAuthor = currentUser.role === 'author'
-
-  console.log(session)
+  const isWriter = currentUser.role === 'writer'
 
   return (
     <div className="flex min-h-screen w-full flex-col px-2 py-10 sm:px-4 md:px-10 lg:px-14 xl:px-40">
@@ -27,22 +25,26 @@ const page = async () => {
               პროფილი
               <Tabs.Indicator />
             </Tabs.Tab>
-            <Tabs.Tab id="articles">
-              <Tabs.Separator />
-              სტატიები
-              <Tabs.Indicator />
-            </Tabs.Tab>
-            <Tabs.Tab id="users">
-              <Tabs.Separator />
-              მომხმარებლები
-              <Tabs.Indicator />
-            </Tabs.Tab>
+            {(isAdmin || isWriter) && (
+              <Tabs.Tab id="My Articles">
+                <Tabs.Separator />
+                ჩემი სტატიები
+                <Tabs.Indicator />
+              </Tabs.Tab>
+            )}
+            {isAdmin && (
+              <Tabs.Tab id="users">
+                <Tabs.Separator />
+                მომხმარებლები
+                <Tabs.Indicator />
+              </Tabs.Tab>
+            )}
           </Tabs.List>
         </Tabs.ListContainer>
         <Tabs.Panel className="w-full pt-4" id="profile">
           <Profile />
         </Tabs.Panel>
-        <Tabs.Panel className="pt-4" id="articles">
+        <Tabs.Panel className="pt-4" id="My Articles">
           <MyArticles />
         </Tabs.Panel>
         <Tabs.Panel className="pt-4" id="users">

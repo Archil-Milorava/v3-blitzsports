@@ -1,3 +1,4 @@
+'use server'
 import { db } from '@/src/drizzle'
 import { article } from '@/src/drizzle/schema'
 import { publicUserSelect } from '@/src/drizzle/selects'
@@ -82,4 +83,57 @@ export const getArticleByUserId = async (userId: string, page: number = 1) => {
   if (!articles) throw new Error('News not found')
 
   return articles
+}
+
+export const getArticlesByUserIdPaginated = async (userId: string, page: number = 1) => {
+  const limit = 10
+  const offset = (page - 1) * limit
+
+  // 1. Fetch the articles for the current page
+  const articles = await db.query.article.findMany({
+    where: (article, { eq, and }) =>
+      and(eq(article.authorId, userId), eq(article.softDelete, false)),
+    with: {
+      author: {
+        columns: publicUserSelect,
+      },
+    },
+    orderBy: (article, { desc }) => [desc(article.createdAt)],
+    limit: limit,
+    offset: offset,
+  })
+
+  // 2. Fetch the total count to calculate pagination
+  const [totalResult] = await db
+    .select({ total: count() })
+    .from(article)
+    .where(and(eq(article.authorId, userId), eq(article.softDelete, false)))
+
+  const totalPages = Math.ceil(totalResult.total / limit)
+
+  return {
+    articles,
+    totalPages,
+    currentPage: page,
+  }
+}
+
+export const softDeleteArticle = async (articleId: string) => {
+  if (!articleId) {
+    throw new Error('please provide article id')
+  }
+
+  const result = await db
+    .update(article)
+    .set({
+      softDelete: true,
+      deletedAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(eq(article.id, articleId))
+    .returning()
+
+  console.log(result)
+
+  return result[0]
 }
