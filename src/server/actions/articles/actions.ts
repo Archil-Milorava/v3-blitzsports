@@ -1,4 +1,5 @@
 'use server'
+import cloudinary from '@/src/config/cloudinary'
 import { db } from '@/src/drizzle'
 import { article } from '@/src/drizzle/schema'
 import { publicUserSelect } from '@/src/drizzle/selects'
@@ -136,4 +137,37 @@ export const softDeleteArticle = async (articleId: string) => {
   console.log(result)
 
   return result[0]
+}
+
+export const createArticle = async (values: any, authorId: string) => {
+  let imageUrl = ''
+
+  if (values.image) {
+    try {
+      const uploadResponse = await cloudinary.uploader.upload(values.image, {
+        folder: 'articles',
+      })
+      imageUrl = uploadResponse.secure_url
+    } catch (err) {
+      console.error('Cloudinary Error:', err)
+      throw new Error('სურათის ატვირთვა ვერ მოხერხდა')
+    }
+  }
+
+  const slug = values.title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '') + `-${Date.now()}`
+
+  await db.insert(article).values({
+    title: values.title,
+    content: values.content,
+    coverImage: imageUrl,
+    badge: values.badge, 
+    category: values.category,
+    authorId: authorId,
+    slug: slug,
+  })
+
+  return { success: true }
 }

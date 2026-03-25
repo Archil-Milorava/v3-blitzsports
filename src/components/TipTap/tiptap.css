@@ -1,0 +1,84 @@
+/* Editor container */
+.container_editor {
+  background: white;
+  border-radius: 0 0 8px 8px;
+}
+
+/* Editor content area */
+.ProseMirror {
+  min-height: 500px;
+  padding: 1.5rem;
+  outline: none;
+}
+
+/* Basic text styles */
+.ProseMirror p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+/* Headings */
+.ProseMirror h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 1rem 0;
+}
+
+.ProseMirror h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0.75rem 0;
+}
+
+.ProseMirror h3 {
+  font-size: 1.17em;
+  font-weight: bold;
+  margin: 0.5rem 0;
+}
+
+/* Lists */
+.ProseMirror ul, 
+.ProseMirror ol {
+  padding: 0 1rem;
+  margin: 1rem 0;
+}
+
+.ProseMirror li {
+  margin: 0.25rem 0;
+}
+
+/* Blockquotes */
+.ProseMirror blockquote {
+  padding-left: 1rem;
+  border-left: 3px solid #ddd;
+  margin: 1rem 0;
+  color: #666;
+}
+
+/* Code */
+.ProseMirror code {
+  background: #f5f5f5;
+  padding: 0.2em 0.4em;
+  border-radius: 0.3em;
+  font-family: monospace;
+}
+
+/* Images */
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  margin: 1rem 0;
+  border-radius: 4px;
+}
+
+/* Links */
+.ProseMirror a {
+  color: #6b46c1;
+  text-decoration: underline;
+}
+
+/* Focus state */
+.ProseMirror:focus {
+  border-color: #6b46c1;
+  box-shadow: 0 0 0 1px #6b46c1;
+}
