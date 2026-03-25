@@ -1,7 +1,11 @@
 'use client'
 
 import { authClient } from '@/src/lib/auth-client'
-import { getArticleByUserId, softDeleteArticle } from '@/src/server/actions/articles/actions'
+import {
+  getArticleByUserId,
+  getArticlesByUserIdPaginated,
+  softDeleteArticle,
+} from '@/src/server/actions/articles/actions'
 import { Article } from '@/src/types/types'
 import { publishDate } from '@/src/utils/utils'
 import type { Selection } from '@heroui/react'
@@ -23,7 +27,7 @@ export function MyArticles() {
   const [articles, setArticles] = useState<Article[]>([])
   const deleteModal = useOverlayState()
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null)
-
+  const [totalPages, setTotalPages] = useState(1)
   const [page, setPage] = useState(1)
 
   useEffect(() => {
@@ -44,22 +48,17 @@ export function MyArticles() {
 
     const fetchData = async () => {
       setLoading(true)
-      const data = await getArticleByUserId(user.id)
-      setArticles(data || [])
+      const data = await getArticlesByUserIdPaginated(user.id, page)
+      setArticles(data.articles)
+      setTotalPages(data.totalPages)
       setLoading(false)
     }
 
     fetchData()
-  }, [user])
+  }, [user, page])
 
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set())
 
-  const totalPages = Math.ceil(articles.length / ROWS_PER_PAGE)
-
-  const paginatedArticles = useMemo(() => {
-    const start = (page - 1) * ROWS_PER_PAGE
-    return articles.slice(start, start + ROWS_PER_PAGE)
-  }, [page, articles])
 
   const handleDelete = async () => {
     if (!selectedArticleId) return
@@ -108,7 +107,7 @@ export function MyArticles() {
           </Table.Header>
 
           <Table.Body>
-            {paginatedArticles.map((article) => (
+            {articles.map((article) => (
               <Table.Row key={article.id} className="cursor-pointer">
                 <Table.Cell>
                   <div className="flex items-center gap-3">
@@ -182,9 +181,7 @@ export function MyArticles() {
             </Modal.Header>
 
             <Modal.Body>
-              <p className="text-muted text-sm">
-                წაშლის შემდეგ სტატია გადაინაცვლებს ნაგვის ურნაში
-              </p>
+              <p className="text-muted text-sm">წაშლის შემდეგ სტატია გადაინაცვლებს ნაგვის ურნაში</p>
             </Modal.Body>
 
             <Modal.Footer>

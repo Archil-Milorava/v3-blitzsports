@@ -2,9 +2,8 @@ import { auth } from '@/src/lib/auth'
 import { Tabs } from '@heroui/react'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import Profile from './Profile'
-import ManageUsers from './ManageUsers'
-import { MyArticles } from './MyArticles'
+import { MyArticles } from './tabs/MyArticles'
+import Profile from './tabs/Profile'
 
 const page = async () => {
   const session = await auth.api.getSession({
@@ -32,24 +31,24 @@ const page = async () => {
                 <Tabs.Indicator />
               </Tabs.Tab>
             )}
-            {isAdmin && (
+            {/* {isAdmin && (
               <Tabs.Tab id="users">
                 <Tabs.Separator />
                 მომხმარებლები
                 <Tabs.Indicator />
               </Tabs.Tab>
-            )}
+            )} */}
           </Tabs.List>
         </Tabs.ListContainer>
         <Tabs.Panel className="w-full pt-4" id="profile">
-          <Profile />
+          <Profile isAdmin={isAdmin} isWriter={isWriter} />
         </Tabs.Panel>
         <Tabs.Panel className="pt-4" id="My Articles">
           <MyArticles />
         </Tabs.Panel>
-        <Tabs.Panel className="pt-4" id="users">
+        {/* <Tabs.Panel className="pt-4" id="users">
           <ManageUsers />
-        </Tabs.Panel>
+        </Tabs.Panel> */}
       </Tabs>
     </div>
   )

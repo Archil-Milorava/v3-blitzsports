@@ -1,4 +1,3 @@
-// src/components/ArticlesWrapper.tsx
 import { getNewsByCategory } from '../server/actions/articles/actions'
 import NewsCard from './NewsCard'
 import { PaginationBasic } from './ui/PaginationBasic'

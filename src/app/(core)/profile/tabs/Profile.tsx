@@ -3,12 +3,17 @@
 import { authClient } from '@/src/lib/auth-client'
 import { publishDate } from '@/src/utils/utils'
 import { Card, Chip, Skeleton, toast, Tooltip } from '@heroui/react'
-import { LogOutIcon } from 'lucide-react'
+import { FileImage, LogOutIcon, PencilLineIcon } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
-const Profile = () => {
+type ProfileProps = {
+  isAdmin: boolean
+  isWriter: boolean
+}
+
+const Profile = ({ isAdmin, isWriter }: ProfileProps) => {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -74,18 +79,47 @@ const Profile = () => {
             </div>
           </div>
 
-          <div className="pt-4">
-            <Tooltip content="ანგარიშიდან გამოსვლა" closeDelay={0}>
-              <Chip
-                variant="flat"
-                color="danger"
-                className="h-10 cursor-pointer gap-2 px-3 transition-transform hover:scale-105 active:scale-95"
-                onClick={handleSignOut}
-              >
-                <LogOutIcon size={18} />
-                <span className="font-semibold">გამოსვლა</span>
-              </Chip>
-            </Tooltip>
+          <div className="flex gap-4 pt-4">
+            {(isAdmin || isWriter) && (
+              <>
+                <div className="">
+                  <Tooltip closeDelay={0}>
+                    <Chip
+                      color="success"
+                      className="h-10 cursor-pointer gap-2 px-3 transition-transform hover:scale-105 active:scale-95"
+                      // onClick={handleSignOut}
+                    >
+                      <FileImage size={18} />
+                      <span className="font-semibold">ქარდის გაკეთება</span>
+                    </Chip>
+                  </Tooltip>
+                </div>
+                <div className="">
+                  <Tooltip closeDelay={0}>
+                    <Chip
+                      color="warning"
+                      className="h-10 cursor-pointer gap-2 px-3 transition-transform hover:scale-105 active:scale-95"
+                      // onClick={handleSignOut}
+                    >
+                      <PencilLineIcon size={18} />
+                      <span className="font-semibold">სტატიის დაწერა</span>
+                    </Chip>
+                  </Tooltip>
+                </div>
+              </>
+            )}
+            <div className="">
+              <Tooltip closeDelay={0}>
+                <Chip
+                  color="danger"
+                  className="h-10 cursor-pointer gap-2 px-3 transition-transform hover:scale-105 active:scale-95"
+                  onClick={handleSignOut}
+                >
+                  <LogOutIcon size={18} />
+                  <span className="font-semibold">ანგარიშიდან გამოსვლა</span>
+                </Chip>
+              </Tooltip>
+            </div>
           </div>
         </Card.Content>
       </Card>
