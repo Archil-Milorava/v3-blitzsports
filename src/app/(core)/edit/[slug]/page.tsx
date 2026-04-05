@@ -116,9 +116,7 @@ const Page = () => {
   const handlePostArticle: SubmitHandler<Inputs> = async (data) => {
   try {
     setIsSubmitting(true)
-    // Pass 'data' which contains the title, content, image, etc.
     await updateArticle(slug, data) 
-    // Add a redirect or success toast here
   } catch (error) {
     console.error(error)
   } finally {

@@ -171,7 +171,6 @@ export const createArticle = async (values: any, authorId: string) => {
     slug: slug,
   })
   redirect('/')
-  return { success: true }
 }
 
 export const updateArticle = async (slug: string, values: any) => {
@@ -190,7 +189,7 @@ export const updateArticle = async (slug: string, values: any) => {
     }
   }
 
-  const result = await db
+  await db
     .update(article)
     .set({
       title: values.title,
@@ -203,5 +202,5 @@ export const updateArticle = async (slug: string, values: any) => {
     .where(eq(article.slug, slug))
     .returning()
 
-  return result[0]
+  redirect('/')
 }

@@ -2,7 +2,6 @@
 
 import { authClient } from '@/src/lib/auth-client'
 import {
-  getArticleByUserId,
   getArticlesByUserIdPaginated,
   softDeleteArticle,
 } from '@/src/server/actions/articles/actions'
@@ -10,12 +9,13 @@ import { Article } from '@/src/types/types'
 import { publishDate } from '@/src/utils/utils'
 import type { Selection } from '@heroui/react'
 
-import { Avatar, Button, Checkbox, Chip, Modal, Pagination, Spinner, Table } from '@heroui/react'
+import { Avatar, Button, Chip, Modal, Pagination, Spinner, Table } from '@heroui/react'
 import { Icon } from '@iconify/react'
 import { redirect, useRouter } from 'next/navigation'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useOverlayState } from '@heroui/react'
+import Link from 'next/link'
 
 const ROWS_PER_PAGE = 10
 
@@ -59,16 +59,12 @@ export function MyArticles() {
 
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set())
 
-
   const handleDelete = async () => {
     if (!selectedArticleId) return
 
     try {
-      // optimistic UI
       setArticles((prev) => prev.filter((a) => a.id !== selectedArticleId))
-
       await softDeleteArticle(selectedArticleId)
-
       deleteModal.close()
       setSelectedArticleId(null)
     } catch (err) {
@@ -144,9 +140,9 @@ export function MyArticles() {
                     >
                       <Icon icon="gravity-ui:eye" className="size-4" />
                     </Button>
-                    <Button isDisabled isIconOnly size="sm" variant="tertiary">
+                    <Link className='bg-amber-200 rounded-full p-2 hover:opacity-80' href={`edit/${article.slug}`}>
                       <Icon icon="gravity-ui:pencil" className="size-4" />
-                    </Button>
+                    </Link>
                     <Button
                       isIconOnly
                       size="sm"
