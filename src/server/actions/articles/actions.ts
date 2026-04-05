@@ -154,20 +154,53 @@ export const createArticle = async (values: any, authorId: string) => {
     }
   }
 
-  const slug = values.title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)+/g, '') + `-${Date.now()}`
+  const slug =
+    values.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)+/g, '') + `-${Date.now()}`
 
   await db.insert(article).values({
     title: values.title,
     content: values.content,
     coverImage: imageUrl,
-    badge: values.badge, 
+    badge: values.badge,
     category: values.category,
     authorId: authorId,
     slug: slug,
   })
 
   return { success: true }
+}
+
+export const updateArticle = async (slug: string, values: any) => {
+  let imageUrl = values.image
+
+  // If the image starts with "data:image", it's a new Base64 string from the client
+  if (values.image && values.image.startsWith('data:image')) {
+    try {
+      const uploadResponse = await cloudinary.uploader.upload(values.image, {
+        folder: 'articles',
+      })
+      imageUrl = uploadResponse.secure_url
+    } catch (err) {
+      console.error('Cloudinary Error:', err)
+      throw new Error('სურათის განახლება ვერ მოხერხდა')
+    }
+  }
+
+  const result = await db
+    .update(article)
+    .set({
+      title: values.title,
+      content: values.content,
+      coverImage: imageUrl,
+      badge: values.badge,
+      category: values.category,
+      updatedAt: new Date(),
+    })
+    .where(eq(article.slug, slug))
+    .returning()
+
+  return result[0]
 }
