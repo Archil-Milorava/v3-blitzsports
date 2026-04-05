@@ -5,6 +5,7 @@ import { publishDate } from '@/src/utils/utils'
 import { Card, Chip, Skeleton, toast, Tooltip } from '@heroui/react'
 import { FileImage, LogOutIcon, PencilLineIcon } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -73,7 +74,7 @@ const Profile = ({ isAdmin, isWriter }: ProfileProps) => {
             </div>
             <div className="flex flex-col gap-1">
               <span className="text-default-400 text-xs font-bold tracking-wider uppercase">
-                წევრია მას შემდეგ
+                 რეგისტრაცია გაიარა
               </span>
               <span className="text-medium font-medium">{publishDate(user.createdAt)}</span>
             </div>
@@ -82,7 +83,7 @@ const Profile = ({ isAdmin, isWriter }: ProfileProps) => {
           <div className="flex gap-4 pt-4">
             {(isAdmin || isWriter) && (
               <>
-                <div className="">
+                <Link href="/card" className="">
                   <Tooltip closeDelay={0}>
                     <Chip
                       color="success"
@@ -93,8 +94,8 @@ const Profile = ({ isAdmin, isWriter }: ProfileProps) => {
                       <span className="font-semibold">ქარდის გაკეთება</span>
                     </Chip>
                   </Tooltip>
-                </div>
-                <div className="">
+                </Link>
+                <Link href="/write" className="">
                   <Tooltip closeDelay={0}>
                     <Chip
                       color="warning"
@@ -105,7 +106,7 @@ const Profile = ({ isAdmin, isWriter }: ProfileProps) => {
                       <span className="font-semibold">სტატიის დაწერა</span>
                     </Chip>
                   </Tooltip>
-                </div>
+                </Link>
               </>
             )}
             <div className="">

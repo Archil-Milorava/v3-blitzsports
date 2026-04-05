@@ -4,6 +4,7 @@ import { db } from '@/src/drizzle'
 import { article } from '@/src/drizzle/schema'
 import { publicUserSelect } from '@/src/drizzle/selects'
 import { and, count, desc, eq } from 'drizzle-orm'
+import { redirect } from 'next/navigation'
 
 export const getLandingNews = async () => {
   // await new Promise((resolve) => setTimeout(resolve, 60000))
@@ -169,7 +170,7 @@ export const createArticle = async (values: any, authorId: string) => {
     authorId: authorId,
     slug: slug,
   })
-
+  redirect('/')
   return { success: true }
 }
 

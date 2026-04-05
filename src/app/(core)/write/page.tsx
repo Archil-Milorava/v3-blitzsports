@@ -1,23 +1,25 @@
 'use client'
 
 import RichTextEditor from '@/src/components/TipTap/RichTextEditor'
+import { authClient } from '@/src/lib/auth-client'
+import { createArticle } from '@/src/server/actions/articles/actions'
 import {
+  Button,
   FieldError,
   InputGroup,
   Label,
   ListBox,
   ProgressBar,
   Select,
+  Spinner,
   TextField,
 } from '@heroui/react'
-import { ImagePlus, Newspaper } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
-import { Button, Spinner } from '@heroui/react'
-import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { ImagePlus, Newspaper } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
+import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import z from 'zod'
-import { createArticle } from '@/src/server/actions/articles/actions'
-import { authClient } from '@/src/lib/auth-client'
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024
 
@@ -45,7 +47,7 @@ const Page = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [fileName, setFileName] = useState('')
-
+  const router = useRouter()
   useEffect(() => {
     const fetchSession = async () => {
       setIsLoading(true)
