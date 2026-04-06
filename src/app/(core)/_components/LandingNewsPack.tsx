@@ -1,5 +1,4 @@
 import { getLandingNews } from '@/src/server/actions/articles/actions'
-import { Chip } from '@heroui/react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -12,62 +11,59 @@ const LandingNewsPack = async () => {
   const restNews = landingNews.slice(1, 6)
 
   return (
-    <div className="grid h-auto w-full grid-cols-1 gap-4 lg:h-[min(600px,85vh)] lg:grid-cols-12 lg:gap-5">
+    <div className="grid h-auto w-full grid-cols-1 gap-4 lg:h-[600px] lg:grid-cols-12">
+      {/* Latest news */}
       <Link
         href={`/article/${latestNews.slug}`}
-        className="group border-border focus-visible:ring-focus relative min-h-[280px] overflow-hidden rounded-xl border shadow-sm transition-shadow hover:shadow-md lg:col-span-8 lg:min-h-full outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        className="group relative min-h-[300px] overflow-hidden rounded-lg lg:col-span-8 lg:min-h-full"
       >
         <Image
           src={latestNews.coverImage}
           alt={latestNews.title}
           fill
           priority
-          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-          sizes="(max-width: 1024px) 100vw, 66vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/10" aria-hidden />
-        <div className="absolute top-4 left-4 z-10 flex flex-wrap gap-2">
-          {latestNews.category ? (
-            <Chip size="sm" variant="secondary" className="backdrop-blur-sm">
-              {latestNews.category}
-            </Chip>
-          ) : null}
-          <Chip size="sm" color="warning" variant="secondary" className="backdrop-blur-sm">
-            {latestNews.badge}
-          </Chip>
-        </div>
-        <div className="absolute inset-x-0 bottom-0 z-10 p-5 sm:p-6 lg:p-8">
-          <h3 className="text-balance text-xl font-semibold leading-snug text-white drop-shadow-sm transition-colors group-hover:text-white/95 sm:text-2xl lg:text-3xl">
+
+        {/* dark overlay */}
+        <div className="absolute inset-0 bg-black/10" />
+
+        {/* <Chip className="absolute top-4 left-4 z-10">{latestNews.category}</Chip> */}
+
+        <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
+          <h2 className="text-xl font-semibold text-white group-hover:underline lg:text-3xl">
             {latestNews.title}
-          </h3>
+          </h2>
         </div>
       </Link>
 
-      <div className="flex min-h-0 flex-col gap-3 lg:col-span-4 lg:gap-3">
+      {/* Other news */}
+      <div className="flex h-full flex-col gap-4 lg:col-span-4">
         {restNews.map((news) => (
           <Link
             key={news.id}
             href={`/article/${news.slug}`}
-            className="group border-border bg-surface hover:border-accent/30 focus-visible:ring-focus flex min-h-[88px] w-full flex-1 overflow-hidden rounded-xl border shadow-sm transition-all hover:shadow-md outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="group flex min-h-[80px] w-full flex-1 overflow-hidden rounded-lg bg-neutral-100"
           >
-            <div className="border-border relative h-auto min-h-[88px] w-[38%] max-w-[140px] shrink-0 overflow-hidden border-r sm:w-2/6">
+            {/* Image */}
+            <div className="relative h-full w-2/6 overflow-hidden">
               <Image
                 src={news.coverImage}
                 alt={news.title}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
-                sizes="140px"
               />
             </div>
-            <div className="flex min-w-0 flex-1 flex-col justify-center gap-1 p-3 sm:p-3.5">
-              <p className="text-foreground line-clamp-2 text-sm font-medium leading-snug sm:text-base">
-                {news.title}
-              </p>
-              {news.category ? (
-                <span className="text-muted text-xs font-medium uppercase tracking-wide">
-                  {news.category}
-                </span>
-              ) : null}
+
+            {/* Title */}
+            <div className="relative flex w-4/6 items-center p-3">
+              <p className="line-clamp-2 text-lg font-medium group-hover:underline">{news.title}</p>
+
+              {/* <p
+                className="text-accent absolute top-2 right-2 z-10 flex items-center text-xs font-semibold"
+              >
+                {news.category}
+              </p> */}
             </div>
           </Link>
         ))}
