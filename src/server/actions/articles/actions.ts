@@ -1,10 +1,35 @@
 'use server'
 import cloudinary from '@/src/config/cloudinary'
+import { destroyCloudinaryImageByUrl } from '@/src/lib/cloudinary-asset'
+import { auth } from '@/src/lib/auth'
 import { db } from '@/src/drizzle'
 import { article } from '@/src/drizzle/schema'
 import { publicUserSelect } from '@/src/drizzle/selects'
-import { and, count, desc, eq } from 'drizzle-orm'
+import { and, count, desc, eq, ilike, or } from 'drizzle-orm'
+import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
+
+const ROWS_PER_PAGE = 10
+
+function sanitizeIlikeTerm(raw: string) {
+  return raw.trim().replace(/[%_\\]/g, '')
+}
+
+async function requireSessionUser() {
+  const session = await auth.api.getSession({ headers: await headers() })
+  if (!session?.user?.id) {
+    throw new Error('ავტორიზაცია საჭიროა')
+  }
+  return session.user
+}
+
+async function requireAdminUser() {
+  const user = await requireSessionUser()
+  if (user.role !== 'admin') {
+    throw new Error('ადმინისტრატორის უფლება საჭიროა')
+  }
+  return user
+}
 
 export const getLandingNews = async () => {
   // await new Promise((resolve) => setTimeout(resolve, 60000))
@@ -57,7 +82,7 @@ export const getNewsByCategory = async (category: string, page: number = 1) => {
 
 export const getArticle = async (articleSlug: string) => {
   const articleBySlug = await db.query.article.findFirst({
-    where: eq(article.slug, articleSlug),
+    where: (a, { eq, and }) => and(eq(a.slug, articleSlug), eq(a.softDelete, false)),
     with: {
       author: {
         columns: publicUserSelect,
@@ -87,45 +112,140 @@ export const getArticleByUserId = async (userId: string, page: number = 1) => {
   return articles
 }
 
-export const getArticlesByUserIdPaginated = async (userId: string, page: number = 1) => {
-  const limit = 10
-  const offset = (page - 1) * limit
+export const getArticlesByUserIdPaginated = async (
+  userId: string,
+  page: number = 1,
+  search: string = '',
+) => {
+  const limit = ROWS_PER_PAGE
+  const offset = (Math.max(1, page) - 1) * limit
+  const term = sanitizeIlikeTerm(search)
+  const q = term ? `%${term}%` : null
 
-  // 1. Fetch the articles for the current page
+  const countWhere = () => {
+    const active = and(eq(article.authorId, userId), eq(article.softDelete, false))
+    if (!q) return active
+    return and(active, or(ilike(article.title, q), ilike(article.slug, q), ilike(article.category, q)))
+  }
+
   const articles = await db.query.article.findMany({
-    where: (article, { eq, and }) =>
-      and(eq(article.authorId, userId), eq(article.softDelete, false)),
+    where: (a, { eq, and, or, ilike }) => {
+      const active = and(eq(a.authorId, userId), eq(a.softDelete, false))
+      if (!q) return active
+      return and(active, or(ilike(a.title, q), ilike(a.slug, q), ilike(a.category, q)))
+    },
     with: {
       author: {
         columns: publicUserSelect,
       },
     },
-    orderBy: (article, { desc }) => [desc(article.createdAt)],
-    limit: limit,
-    offset: offset,
+    orderBy: (a, { desc }) => [desc(a.createdAt)],
+    limit,
+    offset,
   })
 
-  // 2. Fetch the total count to calculate pagination
-  const [totalResult] = await db
-    .select({ total: count() })
-    .from(article)
-    .where(and(eq(article.authorId, userId), eq(article.softDelete, false)))
+  const [totalResult] = await db.select({ total: count() }).from(article).where(countWhere())
 
-  const totalPages = Math.ceil(totalResult.total / limit)
+  const totalPages = Math.max(1, Math.ceil(totalResult.total / limit))
 
   return {
     articles,
     totalPages,
-    currentPage: page,
+    currentPage: Math.max(1, page),
   }
 }
 
-export const softDeleteArticle = async (articleId: string) => {
-  if (!articleId) {
-    throw new Error('please provide article id')
+export const getSoftDeletedArticlesPaginated = async (page: number = 1, search: string = '') => {
+  await requireAdminUser()
+
+  const limit = ROWS_PER_PAGE
+  const offset = (Math.max(1, page) - 1) * limit
+  const term = sanitizeIlikeTerm(search)
+  const q = term ? `%${term}%` : null
+
+  const countWhere = () => {
+    const base = eq(article.softDelete, true)
+    if (!q) return base
+    return and(base, or(ilike(article.title, q), ilike(article.slug, q), ilike(article.category, q)))
   }
 
-  const result = await db
+  const rows = await db.query.article.findMany({
+    where: (a, { eq, and, or, ilike }) => {
+      const base = eq(a.softDelete, true)
+      if (!q) return base
+      return and(base, or(ilike(a.title, q), ilike(a.slug, q), ilike(a.category, q)))
+    },
+    with: {
+      author: { columns: publicUserSelect },
+    },
+    orderBy: (a, { desc }) => [desc(a.deletedAt), desc(a.createdAt)],
+    limit,
+    offset,
+  })
+
+  const [totalResult] = await db.select({ total: count() }).from(article).where(countWhere())
+  const totalPages = Math.max(1, Math.ceil(totalResult.total / limit))
+
+  return {
+    articles: rows,
+    totalPages,
+    currentPage: Math.max(1, page),
+  }
+}
+
+export const permanentlyDeleteArticle = async (articleId: string) => {
+  await requireAdminUser()
+
+  if (!articleId) {
+    throw new Error('სტატიის იდენტიფიკატორი არ არის მითითებული')
+  }
+
+  const row = await db.query.article.findFirst({
+    where: eq(article.id, articleId),
+  })
+
+  if (!row) {
+    throw new Error('სტატია ვერ მოიძებნა')
+  }
+
+  if (!row.softDelete) {
+    throw new Error('სრულად წაშლა შესაძლებელია მხოლოდ უკვე რბილად წაშლილი სტატიისთვის')
+  }
+
+  await destroyCloudinaryImageByUrl(row.coverImage)
+
+  await db.delete(article).where(eq(article.id, articleId))
+
+  return { ok: true as const }
+}
+
+export const softDeleteArticle = async (articleId: string) => {
+  const sessionUser = await requireSessionUser()
+
+  if (!articleId) {
+    throw new Error('სტატიის იდენტიფიკატორი არ არის მითითებული')
+  }
+
+  const existing = await db.query.article.findFirst({
+    where: eq(article.id, articleId),
+  })
+
+  if (!existing) {
+    throw new Error('სტატია ვერ მოიძებნა')
+  }
+
+  if (existing.softDelete) {
+    return existing
+  }
+
+  const isAdmin = sessionUser.role === 'admin'
+  if (!isAdmin && existing.authorId !== sessionUser.id) {
+    throw new Error('ამ სტატიის წაშლის უფლება არ გაქვთ')
+  }
+
+  await destroyCloudinaryImageByUrl(existing.coverImage)
+
+  const [updated] = await db
     .update(article)
     .set({
       softDelete: true,
@@ -135,9 +255,7 @@ export const softDeleteArticle = async (articleId: string) => {
     .where(eq(article.id, articleId))
     .returning()
 
-  console.log(result)
-
-  return result[0]
+  return updated
 }
 
 export const createArticle = async (values: any, authorId: string) => {

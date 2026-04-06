@@ -15,11 +15,9 @@ const Page = async ({ params, searchParams }: PageProps) => {
   const suspenseKey = `${category}-${currentPage}`
 
   return (
-    <main>
-      <Suspense key={suspenseKey} fallback={<ArticlesWrapperSkeleton />}>
-        <ArticlesWrapper category={category} page={currentPage} />
-      </Suspense>
-    </main>
+    <Suspense key={suspenseKey} fallback={<ArticlesWrapperSkeleton />}>
+      <ArticlesWrapper category={category} page={currentPage} />
+    </Suspense>
   )
 }
 

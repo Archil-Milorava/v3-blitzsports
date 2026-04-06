@@ -1,65 +1,52 @@
 import Link from 'next/link'
 import { Article } from '../types/types'
+import { getPlainTextExcerpt, publishDate } from '../utils/utils'
+import { Chip } from '@heroui/react'
 import Image from 'next/image'
 
 interface NewsCardProps {
   Article: Article
 }
 
-const NewsCard = ({ Article }: NewsCardProps) => {
-  const formattedDate = new Date(Article.createdAt).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  })
-
-  const getPlainTextExcerpt = (html: string, length: number = 100) => {
-    const plainText = html.replace(/<[^>]*>?/gm, '')
-    return plainText.length > length ? plainText.substring(0, length) + '...' : plainText
-  }
+const NewsCard = ({ Article: article }: NewsCardProps) => {
   return (
     <Link
-      href={`article/${Article.id}`}
-      className="group relative flex h-full transform cursor-pointer flex-col overflow-hidden rounded-sm bg-[#FFFCF1] shadow-xs transition-all duration-300 hover:-translate-y-1 hover:shadow-sm"
+      href={`/article/${article.slug}`}
+      className="group border-border bg-surface focus-visible:ring-focus relative flex h-full flex-col overflow-hidden rounded-xl border shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
-      {/* Image with gradient overlay */}
-      <div className="relative aspect-video w-full overflow-hidden">
+      <div className="relative aspect-[16/10] w-full overflow-hidden">
         <Image
-          src={Article.coverImage}
-          alt={Article.title}
-          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-          priority
+          src={article.coverImage}
+          alt={article.title}
           fill
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          sizes="(max-width: 768px) 100vw, 50vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
-
-        {/* Floating category chip */}
-        <div className="absolute top-4 left-4">
-          <span className="bg-secondary inline-flex items-center rounded-full px-3 py-1.5 text-xs tracking-wider text-white backdrop-blur-sm">
-            {Article.category?.toUpperCase()}
-          </span>
-        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/15 to-transparent" aria-hidden />
+        {article.category ? (
+          <div className="absolute top-3 left-3 z-10">
+            <Chip size="sm" variant="secondary" className="backdrop-blur-sm">
+              {article.category}
+            </Chip>
+          </div>
+        ) : null}
       </div>
 
-      {/* Content section */}
-      <div className="flex flex-grow flex-col p-5">
-        {/* Date above title */}
-        <span className="mb-1.5 text-xs font-medium text-gray-500">{formattedDate}</span>
+      <div className="flex min-h-0 flex-grow flex-col p-5">
+        <time className="text-muted mb-1 text-xs font-medium" dateTime={new Date(article.createdAt).toISOString()}>
+          {publishDate(article.createdAt)}
+        </time>
 
-        <h2 className="mb-2.5 line-clamp-2 text-xl leading-tight font-bold text-gray-900">
-          {Article.title}
+        <h2 className="text-foreground group-hover:text-accent mb-2 line-clamp-2 text-lg font-bold leading-snug tracking-tight transition-colors sm:text-xl">
+          {article.title}
         </h2>
 
-        {/* Content excerpt with fade effect */}
-        <div className="relative mb-4">
-          <p className="line-clamp-2 text-sm text-gray-600">
-            {getPlainTextExcerpt(Article.content)}
-          </p>
-        </div>
+        <p className="text-muted line-clamp-2 text-sm leading-relaxed">
+          {getPlainTextExcerpt(article.content, 140)}
+        </p>
       </div>
 
-      {/* Hover state indicator */}
-      <div className="bg-secondary absolute inset-x-0 bottom-0 h-1 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="bg-accent h-1 w-full origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100" />
     </Link>
   )
 }

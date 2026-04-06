@@ -15,9 +15,7 @@ export function PaginationBasic({ totalPages }: { totalPages: number }) {
 
     router.push(`${pathname}?${params.toString()}`)
 
-    window.scrollTo({
-      top: 0,
-    })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   return (

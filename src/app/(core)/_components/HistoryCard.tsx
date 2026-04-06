@@ -1,56 +1,51 @@
 import { Article } from '@/src/types/types'
-import { getPlainTextExcerpt } from '@/src/utils/utils'
+import { getPlainTextExcerpt, publishDate } from '@/src/utils/utils'
+import { Chip } from '@heroui/react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-interface NewsCardProps {
+interface HistoryCardProps {
   history: Article
 }
 
-const HistoryCard = ({ history }: NewsCardProps) => {
-  const formattedDate = new Date(history.updatedAt).toLocaleDateString('en-US', {
-    year: '2-digit',
-    month: '2-digit',
-    day: '2-digit',
-  })
-
+const HistoryCard = ({ history }: HistoryCardProps) => {
   return (
     <Link
       href={`/article/${history.slug}`}
-      className="group relative flex h-auto cursor-pointer flex-col overflow-hidden rounded-lg bg-white shadow-sm transition-all duration-300 hover:shadow-md md:h-64 md:flex-row"
+      className="group border-border bg-surface focus-visible:ring-focus relative flex h-auto cursor-pointer flex-col overflow-hidden rounded-xl border shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md md:h-64 md:flex-row outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
-      {/* Hover border animation */}
-      <div className="bg-accent absolute top-0 right-0 h-full w-0 transition-all duration-300 group-hover:w-1" />
-
-      {/* Image Section */}
-      <div className="relative h-56 w-full overflow-hidden transition-transform duration-300 group-hover:scale-[1.02] md:h-full md:w-2/5">
+      <div className="border-border relative h-52 w-full shrink-0 overflow-hidden border-b md:h-full md:w-2/5 md:border-r md:border-b-0">
         <Image
           src={history.coverImage}
           alt={history.title}
           fill
-          className="h-auto w-full object-cover transition-transform duration-700 group-hover:scale-100"
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          sizes="(max-width: 768px) 100vw, 40vw"
         />
-        <span className="bg-accent text-accent-foreground absolute top-2 left-2 z-10 rounded px-2 py-1 text-xs font-semibold tracking-wider capitalize">
-          {history.category?.toUpperCase()}
-        </span>
+        <div className="absolute top-3 left-3 z-10 flex flex-wrap gap-2">
+          {history.category ? (
+            <Chip size="sm" color="success" variant="secondary" className="backdrop-blur-sm">
+              {history.category}
+            </Chip>
+          ) : null}
+        </div>
       </div>
 
-      {/* Content Section */}
-      <div className="flex w-full flex-col p-5 transition-transform duration-300 group-hover:translate-x-1 md:w-3/5 md:p-6">
-        <div className="flex-grow">
-          <h2 className="group-hover:text-secondary mb-3 line-clamp-2 text-xl font-bold text-gray-900 transition-colors duration-200">
+      <div className="flex w-full min-w-0 flex-col p-5 md:w-3/5 md:p-6">
+        <div className="min-h-0 flex-1">
+          <h2 className="text-foreground group-hover:text-accent mb-2 line-clamp-2 text-xl font-bold leading-snug tracking-tight transition-colors md:text-2xl">
             {history.title}
           </h2>
-          <p className="mb-4 line-clamp-3 text-sm text-gray-600 transition-colors duration-200 group-hover:text-gray-800 md:text-base">
-            {getPlainTextExcerpt(history.content)}
+          <p className="text-muted group-hover:text-foreground/90 line-clamp-3 text-sm leading-relaxed transition-colors md:text-base">
+            {getPlainTextExcerpt(history.content, 220)}
           </p>
         </div>
 
-        <div className="flex items-center justify-between border-t border-gray-100 pt-3">
-          <div className="text-xs font-medium text-gray-500 transition-colors duration-200 group-hover:text-gray-700">
-            {formattedDate}
-          </div>
-          <span className="group-hover:text-secondary text-sm font-medium text-black transition-all duration-300">
+        <div className="border-border mt-4 flex items-center justify-between border-t pt-3">
+          <time className="text-muted text-xs font-medium" dateTime={new Date(history.updatedAt).toISOString()}>
+            {publishDate(history.updatedAt)}
+          </time>
+          <span className="text-accent text-sm font-semibold transition-transform group-hover:translate-x-0.5">
             სრულად →
           </span>
         </div>

@@ -2,6 +2,8 @@ import { auth } from '@/src/lib/auth'
 import { Tabs } from '@heroui/react'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { AdminDeletedArticles } from './tabs/AdminDeletedArticles'
+import { ManageUsers } from './tabs/ManageUsers'
 import { MyArticles } from './tabs/MyArticles'
 import Profile from './tabs/Profile'
 
@@ -18,7 +20,7 @@ const page = async () => {
   return (
     <div className="flex min-h-screen w-full flex-col px-2 py-10 sm:px-4 md:px-10 lg:px-14 xl:px-40">
       <Tabs className="w-full">
-        <Tabs.ListContainer className="max-w-md">
+        <Tabs.ListContainer className="max-w-4xl overflow-x-auto">
           <Tabs.List aria-label="Options">
             <Tabs.Tab id="profile">
               პროფილი
@@ -31,13 +33,20 @@ const page = async () => {
                 <Tabs.Indicator />
               </Tabs.Tab>
             )}
-            {/* {isAdmin && (
+            {isAdmin && (
+              <Tabs.Tab id="trash">
+                <Tabs.Separator />
+                წაშლილი სტატიები
+                <Tabs.Indicator />
+              </Tabs.Tab>
+            )}
+            {isAdmin && (
               <Tabs.Tab id="users">
                 <Tabs.Separator />
                 მომხმარებლები
                 <Tabs.Indicator />
               </Tabs.Tab>
-            )} */}
+            )}
           </Tabs.List>
         </Tabs.ListContainer>
         <Tabs.Panel className="w-full pt-4" id="profile">
@@ -46,9 +55,12 @@ const page = async () => {
         <Tabs.Panel className="pt-4" id="My Articles">
           <MyArticles />
         </Tabs.Panel>
-        {/* <Tabs.Panel className="pt-4" id="users">
+        <Tabs.Panel className="pt-4" id="trash">
+          <AdminDeletedArticles />
+        </Tabs.Panel>
+        <Tabs.Panel className="pt-4" id="users">
           <ManageUsers />
-        </Tabs.Panel> */}
+        </Tabs.Panel>
       </Tabs>
     </div>
   )

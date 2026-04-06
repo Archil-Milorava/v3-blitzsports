@@ -4,7 +4,7 @@ import { authClient } from '@/src/lib/auth-client'
 import { Avatar, Chip, toast, Tooltip } from '@heroui/react'
 import { LogIn, LogOutIcon, Menu, X } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 const navLinks = [
@@ -14,7 +14,13 @@ const navLinks = [
   { name: 'სხვა', href: '/other' },
 ]
 
+function isCategoryPathActive(pathname: string | null, href: string) {
+  if (!pathname) return false
+  return pathname === href || pathname.startsWith(`${href}/`)
+}
+
 export default function Navbar() {
+  const pathname = usePathname()
   const { data } = authClient.useSession()
   const user = data?.user
   const router = useRouter()
@@ -47,15 +53,23 @@ export default function Navbar() {
 
       {/* MIDDLE: Desktop Links */}
       <div className="hidden items-center gap-6 md:flex">
-        {navLinks.map((link) => (
-          <Link
-            key={link.name}
-            href={link.href}
-            className="text-accent-foreground hover:text-accent text-sm font-semibold transition-colors"
-          >
-            {link.name}
-          </Link>
-        ))}
+        {navLinks.map((link) => {
+          const active = isCategoryPathActive(pathname, link.href)
+          return (
+            <Link
+              key={link.name}
+              href={link.href}
+              aria-current={active ? 'page' : undefined}
+              className={`text-sm font-semibold transition-colors ${
+                active
+                  ? 'border-b-2 border-accent pb-0.5 text-accent'
+                  : 'border-b-2 border-transparent pb-0.5 text-accent-foreground hover:text-accent'
+              }`}
+            >
+              {link.name}
+            </Link>
+          )
+        })}
       </div>
 
       {/* RIGHT: Desktop Avatar / Auth */}
@@ -120,17 +134,23 @@ export default function Navbar() {
 
         {/* Nav links */}
         <ul className="items-cente justify- flex flex-1 flex-col gap-6 overflow-y-auto px-10 py-5">
-          {navLinks.map((item) => (
-            <li key={item.href}>
-              <Link
-                className="hover:text-accent text-sm font-semibold transition-all"
-                href={item.href}
-                onClick={closeNavbar}
-              >
-                {item.name}
-              </Link>
-            </li>
-          ))}
+          {navLinks.map((item) => {
+            const active = isCategoryPathActive(pathname, item.href)
+            return (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  aria-current={active ? 'page' : undefined}
+                  onClick={closeNavbar}
+                  className={`block text-sm font-semibold transition-colors ${
+                    active ? 'text-accent' : 'text-accent-foreground hover:text-accent'
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              </li>
+            )
+          })}
         </ul>
 
         {/* Bottom bar */}

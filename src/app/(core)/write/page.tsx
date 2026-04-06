@@ -1,7 +1,7 @@
 'use client'
 
 import RichTextEditor from '@/src/components/TipTap/RichTextEditor'
-import { authClient } from '@/src/lib/auth-client'
+import { useAuthSession } from '@/src/hooks/use-auth-session'
 import { createArticle } from '@/src/server/actions/articles/actions'
 import {
   Button,
@@ -13,11 +13,13 @@ import {
   Select,
   Spinner,
   TextField,
+  toast,
 } from '@heroui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ImagePlus, Newspaper } from 'lucide-react'
+import { isRedirectError } from 'next/dist/client/components/redirect-error'
 import { useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import z from 'zod'
 
@@ -41,22 +43,12 @@ const articleSchema = z.object({
 type Inputs = z.infer<typeof articleSchema>
 
 const Page = () => {
-  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
+  const { user, isPending: sessionPending } = useAuthSession()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [user, setUser] = useState<any>(null)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [fileName, setFileName] = useState('')
-  const router = useRouter()
-  useEffect(() => {
-    const fetchSession = async () => {
-      setIsLoading(true)
-      const { data: session } = await authClient.getSession()
-      setUser(session?.user)
-      setIsLoading(false)
-    }
-    fetchSession()
-  }, [])
 
   const {
     setValue,
@@ -92,33 +84,62 @@ const Page = () => {
   }
 
   const handlePostArticle: SubmitHandler<Inputs> = async (data) => {
+    if (!user?.id) {
+      toast.danger('სესია ვერ მოიძებნა. გთხოვთ თავიდან შეხვიდეთ სისტემაში.')
+      return
+    }
+
+    setIsSubmitting(true)
     try {
-      setIsSubmitting(true)
       await createArticle(data, user.id)
     } catch (error) {
+      if (isRedirectError(error)) {
+        throw error
+      }
       console.error(error)
+      const message =
+        error instanceof Error ? error.message : 'სტატიის გამოქვეყნება ვერ მოხერხდა'
+      toast.danger(message)
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  if (isLoading)
+  if (sessionPending) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Spinner />
       </div>
     )
+  }
+
+  if (!user) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4">
+        <p className="text-muted text-center text-sm">სტატიის დასაწერად საჭიროა ავტორიზაცია.</p>
+        <Button variant="primary" onPress={() => router.push('/auth')}>
+          ავტორიზაცია
+        </Button>
+      </div>
+    )
+  }
 
   if (isSubmitting) {
     return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <ProgressBar aria-label="Loading" className="w-64" value={60}>
-          <Label>Loading</Label>
-          <ProgressBar.Output />
-          <ProgressBar.Track>
+      <div className="flex h-screen w-full flex-col items-center justify-center gap-4 px-4">
+        <ProgressBar
+          aria-label="სტატია იგზავნება"
+          className="w-full max-w-sm"
+          isIndeterminate
+        >
+          <Label className="text-foreground text-sm font-medium">სტატია იგზავნება…</Label>
+          <ProgressBar.Track className="mt-3">
             <ProgressBar.Fill />
           </ProgressBar.Track>
         </ProgressBar>
+        <p className="text-muted max-w-sm text-center text-xs">
+          სურათის ატვირთვა და შენახვა შეიძლება რამდენიმე წამს დასჭირდეს.
+        </p>
       </div>
     )
   }
@@ -226,7 +247,7 @@ const Page = () => {
             <TextField
               className="w-full"
               name="title"
-              isInvalid={!!errors.title} // ← was missing
+              isInvalid={!!errors.title}
             >
               <Label>სათაური</Label>
               <InputGroup>
@@ -258,7 +279,7 @@ const Page = () => {
       </div>
 
       <div className="my-2 flex w-full items-end justify-end">
-        <Button type="submit" isPending={isLoading}>
+        <Button type="submit" isPending={isSubmitting}>
           {({ isPending }) => <>{isPending ? <Spinner color="current" size="sm" /> : 'დაპოსტვა'}</>}
         </Button>
       </div>
