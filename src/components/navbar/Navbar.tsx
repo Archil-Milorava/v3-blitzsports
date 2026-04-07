@@ -75,7 +75,7 @@ export default function Navbar() {
       {/* RIGHT: Desktop Avatar / Auth */}
       <div className="hidden md:block">
         {sessionPending ? (
-          <div className="h-10 w-10 animate-pulse rounded-full " />
+          <div className="h-10 w-10 animate-pulse rounded-full" />
         ) : user ? (
           <Link
             href="/profile"
@@ -86,6 +86,7 @@ export default function Navbar() {
                 alt={user.name ?? 'User'}
                 src={user.image ?? ''}
                 referrerPolicy="no-referrer"
+                className="h-full w-full object-cover"
               />
               <Avatar.Fallback>{user.name?.charAt(0).toUpperCase() ?? 'B'}</Avatar.Fallback>
             </Avatar>
@@ -137,16 +138,12 @@ export default function Navbar() {
         {/* Nav links */}
         <ul className="items-cente justify- flex flex-1 flex-col gap-6 overflow-y-auto px-10 py-5">
           {navLinks.map((item) => {
-            const active = isCategoryPathActive(pathname, item.href)
             return (
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  aria-current={active ? 'page' : undefined}
                   onClick={closeNavbar}
-                  className={`block text-sm font-semibold transition-colors ${
-                    active ? 'text-accent' : 'text-accent-foreground hover:text-accent'
-                  }`}
+                  className={`text-accent block text-sm font-semibold transition-colors hover:opacity-70`}
                 >
                   {item.name}
                 </Link>
@@ -178,8 +175,15 @@ export default function Navbar() {
           {user ? (
             <Tooltip delay={0}>
               <Tooltip.Trigger aria-label="Status chip">
-                <Chip color="danger" className="cursor-pointer p-2 hover:opacity-80">
-                  <LogOutIcon onClick={handleSignOut} width={20} />
+                <Chip
+                  color="danger"
+                  className="cursor-pointer p-2 hover:opacity-80"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleSignOut()
+                  }}
+                >
+                  <LogOutIcon width={20} />
                 </Chip>
               </Tooltip.Trigger>
               <Tooltip.Content className="flex items-center gap-1.5">
