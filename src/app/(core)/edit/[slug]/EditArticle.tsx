@@ -2,7 +2,7 @@
 
 import RichTextEditor from '@/src/components/TipTap/RichTextEditor'
 import { updateArticle } from '@/src/server/actions/articles/actions'
-
+import { Article } from '@/src/types/types'
 import {
   Button,
   FieldError,
@@ -14,9 +14,9 @@ import {
   Spinner,
   TextField,
 } from '@heroui/react'
-
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ImagePlus, Newspaper } from 'lucide-react'
+import { useParams } from 'next/navigation'
 import { useRef, useState } from 'react'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import z from 'zod'
@@ -40,38 +40,36 @@ const articleSchema = z.object({
 
 type Inputs = z.infer<typeof articleSchema>
 
-export default function EditArticlePage({ initialData }: any) {
+const EditArticle = ({ initialData, slug }: { initialData: Article; slug: string }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [fileName, setFileName] = useState('')
+  const [editorContent, setEditorContent] = useState(initialData.content)
 
   const {
+    setValue,
     handleSubmit,
     control,
-    setValue,
     formState: { errors },
   } = useForm<Inputs>({
     resolver: zodResolver(articleSchema),
     defaultValues: {
+      image: initialData.coverImage,
+      category: initialData.category || 'არ არის ხელმისაწვდომი',
+      badge: initialData.badge || 'არ არის ხელმისაწვდომი',
       title: initialData.title,
-      category: initialData.category || '',
-      badge: initialData.badge || '',
-      image: initialData.coverImage || '',
       content: initialData.content,
     },
   })
 
-  // 📸 Image handler
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-
     if (file.size > MAX_IMAGE_SIZE) {
       setValue('image', '', { shouldValidate: true })
       setFileName('სურათი ძალიან დიდია (მაქს. 5MB)')
       return
     }
-
     setFileName(file.name)
 
     const reader = new FileReader()
@@ -84,7 +82,7 @@ export default function EditArticlePage({ initialData }: any) {
   const handlePostArticle: SubmitHandler<Inputs> = async (data) => {
     try {
       setIsSubmitting(true)
-      await updateArticle(initialData.slug, data)
+      await updateArticle(slug, data)
     } catch (error) {
       console.error(error)
     } finally {
@@ -95,7 +93,7 @@ export default function EditArticlePage({ initialData }: any) {
   if (isSubmitting) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
-        <ProgressBar className="w-64" value={60}>
+        <ProgressBar aria-label="Loading" className="w-64" value={60}>
           <Label>Loading</Label>
           <ProgressBar.Output />
           <ProgressBar.Track>
@@ -111,114 +109,133 @@ export default function EditArticlePage({ initialData }: any) {
       onSubmit={handleSubmit(handlePostArticle)}
       className="flex min-h-screen w-full flex-col px-2 py-10 sm:px-4 md:px-10 lg:px-14 xl:px-40"
     >
-      <h1 className="mb-4 text-3xl font-bold">Edit Article</h1>
+      <h1 className="mb-4 text-3xl font-bold text-gray-800">დაწერე სტატია</h1>
 
-      <div className="my-6 flex flex-col gap-4">
-
-        {/* IMAGE */}
-        <div>
-          <Label>Image</Label>
+      <div className="my-6 flex flex-col items-start gap-4">
+        {/* image */}
+        <div className="flex flex-col gap-1">
+          <Label>სურათი (მაქს. 5MB)</Label>
           <input
             ref={fileInputRef}
             type="file"
+            accept="image/*"
             className="hidden"
             onChange={handleImageChange}
           />
-
-          <Button type="button" onClick={() => fileInputRef.current?.click()}>
-            <ImagePlus className="size-4" />
-            Upload Image
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => fileInputRef.current?.click()}
+            className="w-full max-w-[280px]"
+          >
+            <ImagePlus className="text-muted size-4" />
+            სურათის ატვირთვა
           </Button>
-
-          {fileName && <p>{fileName}</p>}
-          {errors.image && <p className="text-red-500">{errors.image.message}</p>}
+          {fileName && !errors.image && <p className="text-muted text-sm">✓ {fileName}</p>}
+          {errors.image && <p className="text-sm text-red-500">{errors.image.message as string}</p>}
         </div>
 
-        {/* CATEGORY */}
+        {/* category */}
         <Controller
           name="category"
           control={control}
           render={({ field }) => (
-            <Select value={field.value} onChange={field.onChange}>
-              <Label>Category</Label>
+            <Select
+              className="w-full"
+              placeholder="კატეგორიის არჩევა"
+              value={field.value}
+              onChange={field.onChange}
+              isInvalid={!!errors.category}
+            >
+              <Label>კატეგორია</Label>
               <Select.Trigger>
                 <Select.Value />
+                <Select.Indicator />
               </Select.Trigger>
               <Select.Popover>
                 <ListBox>
                   {categories.map((cat) => (
-                    <ListBox.Item key={cat.id} id={cat.id}>
+                    <ListBox.Item key={cat.id} id={cat.id} textValue={cat.name}>
                       {cat.name}
+                      <ListBox.ItemIndicator />
                     </ListBox.Item>
                   ))}
                 </ListBox>
               </Select.Popover>
-              <FieldError>{errors.category?.message}</FieldError>
+              <FieldError>{errors.category?.message as string}</FieldError>
             </Select>
           )}
         />
 
-        {/* BADGE */}
+        {/* badge */}
         <Controller
           name="badge"
           control={control}
           render={({ field }) => (
-            <Select value={field.value} onChange={field.onChange}>
-              <Label>Type</Label>
+            <Select
+              className="w-full"
+              placeholder="ტიპის არჩევა"
+              value={field.value}
+              onChange={field.onChange}
+              isInvalid={!!errors.badge}
+            >
+              <Label>ტიპი</Label>
               <Select.Trigger>
                 <Select.Value />
+                <Select.Indicator />
               </Select.Trigger>
               <Select.Popover>
                 <ListBox>
-                  <ListBox.Item id="news">news</ListBox.Item>
-                  <ListBox.Item id="history">history</ListBox.Item>
+                  <ListBox.Item id="news" textValue="news">
+                    news <ListBox.ItemIndicator />
+                  </ListBox.Item>
+                  <ListBox.Item id="history" textValue="history">
+                    history <ListBox.ItemIndicator />
+                  </ListBox.Item>
                 </ListBox>
               </Select.Popover>
-              <FieldError>{errors.badge?.message}</FieldError>
+              <FieldError>{errors.badge?.message as string}</FieldError>
             </Select>
           )}
         />
 
-        {/* TITLE */}
+        {/* ── TITLE ─────────────────────────────────────────────── */}
         <Controller
           name="title"
           control={control}
           render={({ field }) => (
-            <TextField isInvalid={!!errors.title}>
-              <Label>Title</Label>
+            <TextField className="w-full" name="title" isInvalid={!!errors.title}>
+              <Label>სათაური</Label>
               <InputGroup>
                 <InputGroup.Prefix>
-                  <Newspaper className="size-4" />
+                  <Newspaper className="text-muted size-4" />
                 </InputGroup.Prefix>
                 <InputGroup.Input
+                  className="w-full"
+                  placeholder="შეიყვანეთ სტატიის სათაური"
                   value={field.value}
                   onChange={field.onChange}
-                  placeholder="Enter title"
                 />
               </InputGroup>
-              <FieldError>{errors.title?.message}</FieldError>
+              <FieldError>{errors.title?.message as string}</FieldError>
             </TextField>
           )}
         />
       </div>
 
-      {/* ✅ EDITOR FIXED */}
-      <Controller
-        name="content"
-        control={control}
-        render={({ field }) => (
-          <RichTextEditor
-            currentContent={field.value}
-            onContentChange={field.onChange}
-          />
-        )}
-      />
+      {/* Rich Text Editor */}
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700">სტატია</label>
+        <RichTextEditor onContentChange={setEditorContent} currentContent={editorContent} />
+      </div>
 
-      <div className="flex justify-end mt-4">
-        <Button type="submit">
-          {isSubmitting ? <Spinner size="sm" /> : 'Update'}
+      <div className="my-2 flex w-full items-end justify-end">
+        <Button type="submit" isPending={isSubmitting}>
+          {({ isPending }) => <>{isPending ? <Spinner color="current" size="sm" /> : 'დაპოსტვა'}</>}
         </Button>
       </div>
     </form>
   )
 }
+
+export default EditArticle

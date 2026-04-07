@@ -173,6 +173,7 @@ export function MyArticles() {
                       <Link
                         className="rounded-full bg-amber-200 p-2 hover:opacity-80"
                         href={`edit/${article.slug}`}
+                        onClick={(e) => e.stopPropagation()}
                       >
                         <Icon icon="gravity-ui:pencil" className="size-4" />
                       </Link>
