@@ -125,7 +125,7 @@ export function MyArticles() {
             onSelectionChange={setSelectedKeys}
           >
             <Table.Header>
-              <Table.Column>სათაური</Table.Column>
+              <Table.Column isRowHeader>სათაური</Table.Column>
               <Table.Column>კატეგორია</Table.Column>
               <Table.Column>ტიპი</Table.Column>
               <Table.Column>შექმნის დრო</Table.Column>
@@ -211,8 +211,8 @@ export function MyArticles() {
 
               <Modal.Body>
                 <p className="text-muted text-sm">
-                  სტატია გადავა ურნაში; სურათი Cloudinary-დანაც წაიშლება. ადმინისტრატორს შეუძლია სრულად
-                  წაშლა პროფილის ტაბიდან „წაშლილი სტატიები“.
+                  სტატია გადავა ურნაში; სურათი Cloudinary-დანაც წაიშლება. ადმინისტრატორს შეუძლია
+                  სრულად წაშლა პროფილის ტაბიდან „წაშლილი სტატიები“.
                 </p>
               </Modal.Body>
 

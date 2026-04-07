@@ -100,9 +100,7 @@ export function AdminDeletedArticles() {
   }
 
   if (!isAdmin) {
-    return (
-      <p className="text-muted text-sm">ამ გვერდზე წვდომა მხოლოდ ადმინისტრატორს აქვს.</p>
-    )
+    return <p className="text-muted text-sm">ამ გვერდზე წვდომა მხოლოდ ადმინისტრატორს აქვს.</p>
   }
 
   return (
@@ -126,7 +124,7 @@ export function AdminDeletedArticles() {
         <Table.ScrollContainer>
           <Table.Content aria-label="Deleted articles table" className="min-w-[800px]">
             <Table.Header>
-              <Table.Column>სათაური</Table.Column>
+              <Table.Column isRowHeader>სათაური</Table.Column>
               <Table.Column>ავტორი</Table.Column>
               <Table.Column>კატეგორია</Table.Column>
               <Table.Column>წაშლის თარიღი</Table.Column>

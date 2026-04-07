@@ -1,5 +1,6 @@
 'use client'
 
+import { useAuthSession } from '@/src/hooks/use-auth-session'
 import { authClient } from '@/src/lib/auth-client'
 import { Avatar, Chip, toast, Tooltip } from '@heroui/react'
 import { LogIn, LogOutIcon, Menu, X } from 'lucide-react'
@@ -21,8 +22,7 @@ function isCategoryPathActive(pathname: string | null, href: string) {
 
 export default function Navbar() {
   const pathname = usePathname()
-  const { data } = authClient.useSession()
-  const user = data?.user
+  const { user, isPending: sessionPending, session } = useAuthSession()
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const closeNavbar = () => setIsOpen(false)
@@ -62,8 +62,8 @@ export default function Navbar() {
               aria-current={active ? 'page' : undefined}
               className={`text-sm font-semibold transition-colors ${
                 active
-                  ? 'border-b-2 border-accent pb-0.5 text-accent'
-                  : 'border-b-2 border-transparent pb-0.5 text-accent-foreground hover:text-accent'
+                  ? 'border-accent text-accent border-b-2 pb-0.5'
+                  : 'text-accent-foreground hover:text-accent border-b-2 border-transparent pb-0.5'
               }`}
             >
               {link.name}
@@ -74,7 +74,9 @@ export default function Navbar() {
 
       {/* RIGHT: Desktop Avatar / Auth */}
       <div className="hidden md:block">
-        {user ? (
+        {sessionPending ? (
+          <div className="h-10 w-10 animate-pulse rounded-full " />
+        ) : user ? (
           <Link
             href="/profile"
             className="hover:border-accent block rounded-full border-2 border-transparent p-1 transition-all"

@@ -141,7 +141,7 @@ export function ManageUsers() {
         <Table.ScrollContainer>
           <Table.Content aria-label="Users table" className="min-w-[880px]">
             <Table.Header>
-              <Table.Column>მომხმარებელი</Table.Column>
+              <Table.Column isRowHeader>მომხმარებელი</Table.Column>
               <Table.Column>ელ-ფოსტა</Table.Column>
               <Table.Column>როლი</Table.Column>
               <Table.Column>რეგისტრაცია</Table.Column>
