@@ -9,7 +9,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 const navLinks = [
-  { name: 'ფოოტბალლ', href: '/football' },
+  { name: 'ფეხბურთი', href: '/football' },
   { name: 'MMA', href: '/mma' },
   { name: 'ფორმულა 1', href: '/f1' },
   { name: 'სხვა', href: '/other' },
